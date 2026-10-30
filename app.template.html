@@ -243,7 +243,7 @@ svg.lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z
 .ol b{font-weight:600}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px}.kv span:nth-child(odd){color:var(--ink2)}
 .tbl{width:100%;font-size:12.5px;border-collapse:collapse}.tbl td{padding:8px 4px;border-top:1px solid rgba(16,24,40,.06);vertical-align:top}.tbl td:first-child{color:var(--ink2);white-space:nowrap;padding-right:14px}
-/* tutorial + Boba */
+/* tutorial */
 #tour{border:0;border-radius:32px;padding:0;width:min(94vw,520px);max-height:94vh;background:var(--surface);box-shadow:inset 0 0 0 1px rgba(255,255,255,.7),0 30px 80px rgba(16,24,40,.22);overflow:auto;color:var(--ink)}
 #tour::backdrop{background:rgba(17,20,24,.45);backdrop-filter:blur(3px)}
 .tour-in{padding:22px;display:flex;flex-direction:column;gap:14px}
@@ -264,28 +264,7 @@ svg.lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z
 .mini-tubes{display:flex;gap:7px;align-items:flex-end}.mini-tubes i{width:20px;border-radius:5px 5px 11px 11px;background:#fff;border:1px solid #DCE2E9;position:relative;overflow:hidden;display:block}
 .mini-tubes i::after{content:"";position:absolute;left:0;right:0;bottom:0;height:var(--f);background:var(--c)}
 .mini-tubes i.sel{box-shadow:0 0 0 3px var(--accent);border-color:var(--ink)}
-.boba{position:fixed;right:14px;bottom:14px;z-index:60;display:flex;flex-direction:column;align-items:flex-end;gap:8px;pointer-events:none}
-.boba>*{pointer-events:auto}
-body:has(#mbar.on) .boba{bottom:84px}
-.boba-dog{position:relative;width:92px;height:92px;padding:0;border:0;background:transparent;cursor:pointer;transform-origin:50% 90%;filter:drop-shadow(0 6px 10px rgba(16,24,40,.14))}
-.boba-dog img{width:100%;height:100%;image-rendering:pixelated;user-select:none;-webkit-user-drag:none}
-.boba-bubble{position:relative;width:min(330px,calc(100vw - 28px));background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.9);border-radius:22px;padding:16px;font-size:13.5px;line-height:1.5;box-shadow:0 1px 2px rgba(16,24,40,.05),0 14px 36px rgba(16,24,40,.12)}
-.boba-bubble::after{content:"";position:absolute;right:38px;bottom:-7px;width:14px;height:14px;background:rgba(255,255,255,.97);transform:rotate(45deg);border-radius:3px}
-.boba-name{font-size:11px;color:var(--ink3);margin:0 0 4px}
-.boba-text{margin:0 30px 10px 0;white-space:pre-line}
-.boba-x{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;background:var(--well);font-size:16px;line-height:1;color:var(--ink2)}
-.boba-btns{display:flex;flex-wrap:wrap;gap:6px}
-.boba-btns>*{font:inherit;font-size:12.5px;color:var(--ink);background:var(--well);border:0;border-radius:999px;padding:7px 12px;cursor:pointer;text-decoration:none;transition:background .2s}
-.boba-btns>*:hover{background:var(--accent)}
-.boba-zzz{position:absolute;top:0;right:0;font-size:13px;color:var(--ink2);opacity:0;letter-spacing:2px}
-.boba-dog.nap{opacity:.85;transform:translateY(6px) scale(.95)}.boba-dog.nap .boba-zzz{opacity:1;animation:boba-zzz 2s ease-in-out infinite}
-.boba-dog.wag{animation:boba-wag .9s ease-in-out}.boba-dog.hop{animation:boba-hop .5s ease-out}.boba-dog.zoom{animation:boba-zoom 1.4s ease-in-out}
-@keyframes boba-wag{0%,100%{transform:rotate(0)}20%{transform:rotate(-6deg)}40%{transform:rotate(6deg)}60%{transform:rotate(-5deg)}80%{transform:rotate(4deg)}}
-@keyframes boba-hop{0%{transform:translateY(0)}40%{transform:translateY(-16px)}100%{transform:translateY(0)}}
-@keyframes boba-zoom{0%{transform:translateX(0)}30%{transform:translateX(-200px) scaleX(-1)}60%{transform:translateX(-100px) scaleX(1)}100%{transform:translateX(0)}}
-@keyframes boba-zzz{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(-6px);opacity:.4}}
-@media (prefers-reduced-motion:reduce){.boba-dog.wag,.boba-dog.hop,.boba-dog.zoom,.boba-dog.nap .boba-zzz{animation:none!important}}
-@media (max-width:640px){.boba-dog{width:64px;height:64px}.boba{right:10px}.boba-bubble{padding:14px}.tour-art{height:130px}}
+@media (max-width:640px){.tour-art{height:130px}}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -965,14 +944,14 @@ function all() { renderL(); renderDial(); renderR(); requestAnimationFrame(() =>
 renderHS(); renderTabs(); rightShell(); all(); applyView();
 </script>
 <script>
-/* ---------- tutorial + Boba (rule-based, no network) ---------- */
+/* ---------- first-visit tutorial ---------- */
 (() => {
-  const KQ = 'ana-boba-quiet', KT = 'ana-tour-v1';
+  const KT = 'ana-tour-v1';
   const store = { get: (k) => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* private mode */ } } };
   const chip = (t, on) => `<span class="chip ${on ? '' : ''}" ${on ? 'aria-pressed="true"' : ''} style="pointer-events:none">${t}</span>`;
   const STEPS = [
     { t: 'Welcome', p: 'A positive ANA is a probability modifier, not a diagnosis. This tool walks through the clinical picture, the titer and the pattern, then suggests a proportionate next step.',
-      note: 'Educational prototype: not validated, not a medical device. It supports clinical judgement and does not replace it.', art: () => `<img src="assets/boba.webp" alt="" width="110" height="110" style="image-rendering:pixelated">` },
+      note: 'Educational prototype: not validated, not a medical device. It supports clinical judgement and does not replace it.', art: () => `<div class="big-ico">${ic('gauge')}</div>` },
     { t: 'Safety comes first', p: 'New proteinuria, serositis, seizures, severe cytopenias, digital ischaemia or rapidly progressive weakness skip the maths. Select any red flag and the answer is same-day evaluation, whatever the titer.',
       art: () => `<div class="big-ico">${ic('shield')}</div>` },
     { t: 'Say what you see', p: 'Tap markers on the body map, or use the Clinical findings chips. Only objective findings that nothing else explains count, and each domain counts its highest item. Fatigue or widespread pain alone lowers the score.',
@@ -981,7 +960,7 @@ renderHS(); renderTabs(); rightShell(); all(); applyView();
       art: () => `<div class="mini-tubes">${[18, 30, 42, 56, 68, 80, 92].map((f, i) => `<i class="${i === 2 ? 'sel' : ''}" style="height:${60 + i * 4}px;--f:${f}%;--c:${i < 2 ? 'var(--pink-1)' : i < 4 ? 'var(--pink-2)' : 'var(--coral)'}"></i>`).join('')}</div>` },
     { t: 'Read the result', p: 'The gauge shows a range, not a verdict. The tier comes from rules: reassure, targeted work-up, or refer. Next steps list what to order, what to avoid and what to tell the patient, and one tap copies a referral summary.',
       art: () => `<svg viewBox="0 0 240 130" width="200" aria-hidden="true">${Array.from({ length: 30 }, (_, i) => { const a = Math.PI * (1 - i / 29), c = Math.cos(a), sn = Math.sin(a); return `<line x1="${120 + 76 * c}" y1="${120 - 76 * sn}" x2="${120 + 100 * c}" y2="${120 - 100 * sn}" stroke="${i < 11 ? colAt(Math.round(i * 39 / 29)) : '#E3E8EE'}" stroke-width="6" stroke-linecap="round"/>`; }).join('')}<text x="120" y="112" text-anchor="middle" font-size="30" font-weight="500" fill="#111418">12%</text></svg>` },
-    { t: 'Practise and learn', p: 'The Triage Challenge has nine vignettes with scoring. Education has real microscope slides and clinical photos. Model & limits explains every assumption. Boba, bottom right, can explain your result or replay this tutorial.',
+    { t: 'Practise and learn', p: 'The Triage Challenge has nine vignettes with scoring. Education has real microscope slides and clinical photos. Model & limits explains every assumption. You can replay this tutorial from the link at the bottom of the page.',
       art: () => `<div class="row">${chip('Triage Challenge', 1)}${chip('Education')}${chip('Model & limits')}</div>` },
   ];
   const dlg = $('#tour'); let i = 0;
@@ -998,109 +977,7 @@ renderHS(); renderTabs(); rightShell(); all(); applyView();
   dlg.addEventListener('close', () => { store.set(KT, '1'); document.dispatchEvent(new Event('tour-closed')); });
   $('#replayTour').onclick = window.startTour;
 
-  /* ---------- Boba ---------- */
-  const GENERAL = [
-    'About 1 in 7 healthy adults has an ANA of 1:80 or more, and about 1 in 3 at 1:40.',
-    'ANA titers do not track disease activity. Do not repeat the ANA to monitor lupus.',
-    'More than 90% of ANA-positive people never develop an autoimmune rheumatic disease.',
-    'About 8–11% of people with fibromyalgia are ANA-positive, similar to the background rate.',
-    'A negative IIF ANA does not exclude Sjögren’s or antisynthetase syndrome: anti-Ro and Jo-1 can be missed.',
-    'Isolated anti-DFS70 appears in 2–22% of healthy people and in under 1% of autoimmune rheumatic disease.',
-    'Women have roughly double the healthy ANA prevalence, and it climbs with age to about 19% after 70.',
-    'The 10-point SLE threshold classifies research cohorts. It is not a diagnosis.',
-    'In children, a positive ANA usually matters only from about 1:640 upward.',
-  ];
-  const PETS = ['Woof!', 'That is the spot.', 'More pets, please.', 'I could get used to this.', 'Good human.'];
-  const TAB_HELP = {
-    calc: 'This is the calculator. Tell it the findings (body map or chips), the titer and pattern, and read the tier and next steps on the right.',
-    chal: 'Triage Challenge: nine short cases. Choose Dismiss, Order targeted work-up or Refer, and see the evidence-based answer and what it cost.',
-    edu: 'Education: real microscope slides and clinical photos with teaching notes. Tap an image to enlarge it; credits are underneath.',
-    evid: 'Model & limits: the disclaimer, every known limitation, how the numbers are built and the licences.',
-    about: 'About the author, with a way to contact her.',
-  };
-  const RULES = [
-    { id: 'red', cool: 60e3, when: (c) => c.S.red.size > 0, text: () => 'A red flag overrides titer and pattern. That means same-day evaluation and urgent rheumatology input, not a work-up on paper.' },
-    { id: 'fatigue', cool: 1e12, when: (c) => c.S.sym.size === 1 && c.S.sym.has('nonspecific_only'), text: () => 'Fatigue and diffuse aches alone score minus 2 and are not an indication to test. That is the classic low-value ANA.' },
-    { id: 'first', cool: 1e12, when: (c) => c.S.sym.size >= 1 && !c.S.sym.has('nonspecific_only'), text: () => 'Each domain counts only its highest finding, and only if nothing else explains it. Add what you see and I will keep the score.' },
-    { id: 't40', cool: 1e12, when: (c) => c.S.method === 'iif' && c.S.titer === 1, text: () => '1:40 shows up in about 1 in 3 healthy adults, so it barely moves the odds.' },
-    { id: 't80', cool: 1e12, when: (c) => c.S.method === 'iif' && c.S.titer === 2, text: () => 'An exact 1:80 is common in healthy adults (about 1 in 7) and slightly lowers the odds of SLE. The real rise comes between 1:160 and 1:320.' },
-    { id: 'high-quiet', cool: 1e12, when: (c) => c.S.method === 'iif' && c.S.titer >= 5 && c.res?.r.numeric && c.res.r.score <= 0, text: () => 'A very high titer with no findings still gives a modest probability. Ask why it was ordered and take a careful history.' },
-    { id: 'legacy', cool: 1e12, when: (c) => c.S.legacy && c.S.method === 'iif', text: () => 'The 1:32 series is mapped to the standard series by rank, so treat the tier as approximate: about one tier of uncertainty.' },
-    { id: 'sp', cool: 1e12, when: (c) => c.S.method === 'sp', text: () => 'Solid-phase assays give no titer or pattern. If IIF is available, ask for the titer and ICAP code: they carry information.' },
-    { id: 'peds', cool: 1e12, when: (c) => c.S.peds, text: () => 'Child mode uses rules only: no estimate and no DFS70 rule-out. In a well child, a titer below 1:640 can usually be disregarded.' },
-    { id: 'ac2', cool: 1e12, when: (c) => c.S.method === 'iif' && c.S.pattern === 'AC-2' && !c.S.dfs, text: () => 'Dense fine speckled: confirm monospecific anti-DFS70 before reassuring anyone. About half of labs mis-call this pattern.' },
-    { id: 'ac3', cool: 1e12, when: (c) => c.S.method === 'iif' && c.S.pattern === 'AC-3', text: () => 'Centromere: check ALP and AMA as well as Raynaud and sicca. In a large cohort, primary biliary cholangitis and Sjögren’s outnumbered scleroderma.' },
-    { id: 'ac19', cool: 1e12, when: (c) => c.S.method === 'iif' && c.S.pattern === 'AC-19_20', text: () => 'Cytoplasmic speckled can hide behind a “negative” nuclear screen. Think antisynthetase syndrome with weakness, lung disease or mechanic’s hands.' },
-    { id: 'scope', cool: 1e12, when: (c) => c.S.method === 'iif' && c.S.pattern !== 'UNSPEC', text: () => 'Look at the dividing cells. A dark chromosome plate points to fine or coarse speckled; a stained plate to homogeneous or DFS70.' },
-    { id: 'green', cool: 90e3, when: (c) => c.touched && c.res?.r.tier === 'GREEN', text: () => 'Reassure and stop. A positive ANA with no objective findings does not need ENA, a repeat ANA or a referral. Give the safety-net advice.' },
-    { id: 'yellow', cool: 90e3, when: (c) => c.touched && c.res?.r.tier === 'YELLOW', text: () => 'Targeted, not shotgun: order only what the pattern and findings point to, and refer if anything comes back abnormal.' },
-    { id: 'red-tier', cool: 90e3, when: (c) => c.touched && /^RED/.test(c.res?.r.tier || ''), text: () => 'This one deserves a specialist. Send the baseline labs with the referral; Copy referral summary does the paperwork.' },
-    { id: 'tab-chal', cool: 1e12, when: (c) => c.tab === 'chal', text: () => 'Restraint is rewarded here. Dismissing a benign case is a perfectly correct answer.' },
-    { id: 'tab-edu', cool: 1e12, when: (c) => c.tab === 'edu', text: () => 'Tap any image to enlarge it. The author and licence sit under each one. If you can find a missing image, send it to my human.' },
-    { id: 'tab-evid', cool: 1e12, when: (c) => c.tab === 'evid', text: () => 'Please read the limitations. I am a dog, not a validated diagnostic device.' },
-  ];
-
-  let quiet = store.get(KQ) === '1', asleep = false, pets = 0, g = 0, lastActive = Date.now(), lastAuto = 0, hideTimer = null, touched = false, sig = null;
-  const lastSaid = {};
-  const root = document.createElement('div'); root.className = 'boba';
-  root.innerHTML = `<div class="boba-bubble" role="status" aria-live="polite" hidden><button class="boba-x" aria-label="Close">×</button><p class="boba-name">Boba</p><p class="boba-text"></p><div class="boba-btns"></div></div>
-    <button class="boba-dog" aria-label="Boba, the assistant dog. Press for help." title="Click me. Double click for zoomies."><img src="assets/boba.webp" alt="" width="120" height="120" draggable="false"><span class="boba-zzz" aria-hidden="true">z z z</span></button>`;
-  document.body.append(root);
-  const bubble = $('.boba-bubble', root), text = $('.boba-text', root), btns = $('.boba-btns', root), dog = $('.boba-dog', root);
-  const anim = (cls, ms) => { dog.classList.remove('wag', 'hop', 'zoom'); void dog.offsetWidth; dog.classList.add(cls); setTimeout(() => dog.classList.remove(cls), ms); };
-  const close = () => { bubble.hidden = true; clearTimeout(hideTimer); };
-  function say(msg, choices = menu(), autoHide = 0) {
-    text.textContent = msg; btns.replaceChildren();
-    for (const [label, fn] of choices) { const b = document.createElement('button'); b.textContent = label; b.onclick = (e) => { e.stopPropagation(); fn(); }; btns.append(b); }
-    bubble.hidden = false; anim('wag', 900); clearTimeout(hideTimer); if (autoHide) hideTimer = setTimeout(close, autoHide);
-  }
-  const menu = () => [['Explain my result', explain], ['Teach me something', teach], ['What is on this tab?', () => say(TAB_HELP[S.tab])], ['Replay tutorial', () => { close(); window.startTour(); }], [quiet ? 'Unmute' : 'Hush', toggleQuiet]];
-  const teach = () => say(GENERAL[g++ % GENERAL.length], [['Another one', teach], ['Back', () => say('What can I help with?')]]);
-  function explain() {
-    const R = window._res; if (S.tab !== 'calc' || !R) return say('Open the Calculator tab, enter a few findings and a titer, and I will explain what the tool is doing.', [['Take me there', () => { S.tab = 'calc'; renderTabs(); close(); }]]);
-    const { r, lo, hi } = R, T = TIER[r.tier], tl = CFG.titerSpectrum[S.titer];
-    let m = `${T.head}.\n`;
-    if (r.tier === 'URGENT') m += 'You selected a red flag, so titer and pattern are ignored and no estimate is calculated.';
-    else if (!r.numeric) m += 'Child mode uses rules only, so there is no numeric estimate.';
-    else {
-      m += `Clinical score ${r.score} gives a pre-test probability of ${pct(r.pre)}. ` + (S.method === 'iif' ? `The titer ${S.legacy ? tl.legacy32 : tl.std} multiplies the odds by ${r.lrT}` : `The assay combination multiplies the odds by ${r.lrT}`) +
-        `${r.cf < 1 ? `, damped ×${r.cf} for a confounder` : ''}${r.lrP !== 1 ? `, and the pattern adds ×${r.lrP.toFixed(1)}` : ''}. Post-test: about ${pct(r.post)} (likely ${rng(lo.post, hi.post)}).`;
-    }
-    const unc = []; if (S.method === 'iif' && S.pattern === 'UNSPEC') unc.push('the pattern is not reported'); if (!S.sym.size && !S.red.size) unc.push('no findings entered'); if (S.legacy) unc.push('the 1:32 series is approximate');
-    m += `\nUncertain: ${unc.length ? unc.join('; ') : 'the weights are design assumptions (grade D) and not validated on patients'}.`;
-    say(m, [['Teach me something', teach], ['Back', () => say('What can I help with?')]]);
-  }
-  function toggleQuiet() { quiet = !quiet; store.set(KQ, quiet ? '1' : '0'); say(quiet ? 'Okay, I will stay quiet. Click me any time.' : 'Yay! I will chime in as you work.', menu(), 4000); }
-
-  dog.addEventListener('click', () => {
-    lastActive = Date.now();
-    if (asleep) { asleep = false; dog.classList.remove('nap'); return say('Woof! I am awake. What can I help with?'); }
-    if (!bubble.hidden) return close();
-    pets++; anim('hop', 500); say(pets > 1 && pets % 3 === 0 ? PETS[(pets / 3) % PETS.length] : 'What can I help with?');
-  });
-  dog.addEventListener('dblclick', () => { anim('zoom', 1400); say('Zoomies!', [], 2500); });
-  $('.boba-x', root).onclick = close;
-  for (const ev of ['scroll', 'pointerdown', 'keydown']) addEventListener(ev, () => { lastActive = Date.now(); }, { passive: true });
-
-  // context rules: poll a snapshot of the app state, speak the first eligible rule
-  const snap = () => JSON.stringify([S.tab, S.view, S.method, S.titer, S.combo, S.legacy, S.pattern, [...S.sym], [...S.red], [...S.conf], S.peds, S.ab, S.labs, S.dfs]);
-  setInterval(() => {
-    const now = Date.now(), s = snap();
-    if (sig === null) { sig = s; return; }
-    if (s === sig) return; sig = s; touched = touched || S.tab === 'calc';
-    if (quiet || asleep || !bubble.hidden || dlg.open || now - lastAuto < 12e3) return;
-    const ctx = { S, res: window._res, tab: S.tab, touched };
-    const rule = RULES.find((r) => r.when(ctx) && now - (lastSaid[r.id] ?? -1e13) > r.cool);
-    if (rule) { lastSaid[rule.id] = now; lastAuto = now; say(rule.text(ctx), menu(), 12000); }
-  }, 900);
-  setInterval(() => {
-    if (!asleep && Date.now() - lastActive > 180e3) { asleep = true; close(); dog.classList.add('nap'); return; }
-    if (!asleep && bubble.hidden && Math.random() < 0.15) anim(Math.random() < 0.6 ? 'wag' : 'hop', 900);
-  }, 5000);
-
-  const greet = () => { if (!quiet) say('Hi, I am Boba! Tap me any time: I can explain your result, teach you a fact, or replay the tutorial.', menu(), 12000); };
-  if (store.get(KT)) setTimeout(greet, 2200);
-  else { setTimeout(window.startTour, 700); document.addEventListener('tour-closed', () => setTimeout(greet, 900), { once: true }); }
+  if (!store.get(KT)) setTimeout(window.startTour, 700);
 })();
 </script>
 <script type="module">

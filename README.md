@@ -22,7 +22,7 @@ node engine.check.mjs    # engine and challenge-case tests
 | `ANA-Calculator-Research-Report.md` | Evidence synthesis and design decisions |
 | `assets/anatomy.glb` | 3D anatomy (BodyParts3D, CC BY-SA 2.1 Japan) |
 | `assets/edu/`, `assets/edu/credits.json` | Education images with author and licence for each |
-| `assets/about/`, `assets/boba.webp` | About photo; Boba, the assistant |
+| `assets/about/` | About photo |
 | `tools/` | Reproducible asset builders: `build-anatomy.mjs`, `fetch-edu-images.mjs`, `external-figures.json` (the latter needs ImageMagick) |
 
 ## Deploy
