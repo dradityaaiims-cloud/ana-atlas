@@ -8,7 +8,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
 <script src="https://cdn.tailwindcss.com/3.4.16"></script>
 <script>
 tailwind.config = { theme: { extend: {
@@ -172,16 +171,15 @@ svg.lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z
   box-shadow:var(--shadow);transition:box-shadow .25s var(--ease)}
 #patSel:hover{box-shadow:var(--shadow-hover)}#patSel:disabled{opacity:.45;cursor:not-allowed}
 .scope-card .pinfo{margin-top:12px}.scope-card .pinfo h2{font-size:clamp(18px,2vw,22px)}
-#bc{touch-action:auto;cursor:default}
 #bodyBox{position:absolute;inset:0}
-#bc{width:100%;height:100%;display:block}
+#bodyImg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;user-select:none;-webkit-user-drag:none}
 #hs{position:absolute;inset:0;pointer-events:none;z-index:4}
 #hs svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .hsd,.hsl{position:absolute;left:0;top:0;pointer-events:auto;will-change:transform;transition:opacity .25s,background .25s,box-shadow .25s}
 .hsd{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.35);border:1.5px solid #fff;backdrop-filter:blur(2px);display:grid;place-items:center;box-shadow:0 2px 8px rgba(16,24,40,.12)}
 .hsd::before{content:"";width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 0 1px rgba(16,24,40,.2);transition:background .25s}
 .hsd::after{content:"";position:absolute;inset:-1px;border-radius:50%;border:1.5px solid rgba(255,255,255,.9);animation:pulse 2.6s ease-out infinite}
-.hsd.on{background:var(--accent)}.hsd.on::before{background:var(--ink)}.hsd.on::after{border-color:var(--accent)}
+.hsd.on{background:var(--accent);box-shadow:0 0 0 6px rgba(246,226,122,.5),0 2px 8px rgba(16,24,40,.12)}.hsd.on::before{background:var(--ink)}.hsd.on::after{border-color:var(--accent)}
 .hsl{display:flex;align-items:center;gap:7px;background:#fff;border-radius:999px;padding:7px 12px 7px 10px;font-size:12px;white-space:nowrap;box-shadow:var(--shadow-hover);cursor:pointer}
 .hsl::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--coral);flex:none}.hsl.alt::before{background:var(--cobalt)}
 .hsl.on{background:var(--accent);font-weight:500}
@@ -211,12 +209,12 @@ svg.lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z
   .btn-big{min-width:100%}
 }
 @media (min-width:641px) and (max-width:1023px){ .hero-wrap{margin-bottom:6px} }
-#mbar{position:fixed;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));z-index:40;display:none;align-items:center;justify-content:space-between;gap:10px;
+#mbar{position:fixed;left:10px;right:10px;bottom:calc(max(10px,env(safe-area-inset-bottom)) + 66px);z-index:40;display:none;align-items:center;justify-content:space-between;gap:10px;
   background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-radius:999px;padding:8px 8px 8px 16px;box-shadow:0 1px 2px rgba(16,24,40,.05),0 10px 30px rgba(16,24,40,.08);border:1px solid rgba(255,255,255,.8)}
 #mbar .mb-l{display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap}
 #mbar .mb-go{width:40px;height:40px;border-radius:50%;background:var(--accent);display:grid;place-items:center;flex:none}
 #mbar .mb-go svg{width:18px;height:18px;stroke:var(--ink);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transform:rotate(90deg)}
-@media (max-width:1023px){ #mbar.on{display:flex} .foot{margin-bottom:76px} }
+@media (max-width:1023px){ #mbar.on{display:flex} .foot{margin-bottom:150px} }
 /* education + model */
 .sec-h{font-size:clamp(22px,2.6vw,30px);font-weight:500;letter-spacing:-.02em;margin:26px 4px 2px}
 .sec-p{margin:0 4px 14px;font-size:13.5px;color:var(--ink2);max-width:760px;line-height:1.5}
@@ -283,7 +281,7 @@ svg.lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z
    <div class="order-1 lg:order-2 hero-wrap">
     <div class="center-grid">
      <div class="hero" id="hero" data-mode="body">
-      <div class="body-only" id="bodyBox"><canvas id="bc" aria-label="3D anatomy: tap a marker to add a finding"></canvas><div id="hs"></div><div class="hero-note body" id="bodyNote">Loading anatomy…</div></div>
+      <div class="body-only" id="bodyBox"><img id="bodyImg" src="assets/body.webp" width="1000" height="1250" alt="Front view of the human body showing muscles, bones and organs. Tap a marker to add a finding." decoding="async" draggable="false"><div id="hs"></div></div>
      </div>
      <section class="card scope-card" aria-label="Microscope: ANA pattern viewer">
       <div class="card-h"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/></svg></span><h3>Microscope: ANA pattern</h3><span class="ml-auto pill b"><i></i>HEp-2 cells</span></div>
@@ -315,7 +313,7 @@ svg.lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z
   <main id="view-evid" hidden class="mt-4"></main>
   <dialog id="lb"><button class="ibtn" id="lbX" aria-label="Close image">×</button><img id="lbImg" alt=""><div class="cr" id="lbCap"></div></dialog>
 
-  <p class="foot">Supports, and does not replace, clinical judgement. Classification criteria are not diagnostic criteria. Pre-test weights, pattern likelihood ratios, confounder factors and tier cut-points are design assumptions (grade D) that need local calibration and rheumatology review before clinical use. Percentages are illustrative ranges, not personalized risk. The microscope view is a procedural illustration, not a patient image. 3D anatomy derived from <a href="https://dbarchive.biosciencedbc.jp/en/bodyparts3d/download.html" target="_blank" rel="noopener" style="text-decoration:underline">BodyParts3D</a>, © The Database Center for Life Science, CC BY-SA 2.1 Japan (simplified; shared under the same licence). <button class="link" id="replayTour">Replay the tutorial</button></p>
+  <p class="foot">Supports, and does not replace, clinical judgement. Classification criteria are not diagnostic criteria. Pre-test weights, pattern likelihood ratios, confounder factors and tier cut-points are design assumptions (grade D) that need local calibration and rheumatology review before clinical use. Percentages are illustrative ranges, not personalized risk. The microscope view is a procedural illustration, not a patient image. Body image rendered from a 3D model derived from <a href="https://dbarchive.biosciencedbc.jp/en/bodyparts3d/download.html" target="_blank" rel="noopener" style="text-decoration:underline">BodyParts3D</a>, © The Database Center for Life Science, CC BY-SA 2.1 Japan (simplified; shared under the same licence). <button class="link" id="replayTour">Replay the tutorial</button></p>
  </div>
 </div>
 
@@ -421,7 +419,7 @@ function renderTabs() {
   $('#tabs').innerHTML = TABS.map(([k, l, i]) => `<button class="tab" role="tab" aria-selected="${S.tab === k}" data-tab="${k}">${ic(i)}${l}</button>`).join('');
   ['calc', 'chal', 'edu', 'evid', 'about'].forEach((k) => ($('#view-' + k).hidden = S.tab !== k));
 }
-$('#tabs').onclick = (e) => { const b = e.target.closest('[data-tab]'); if (!b) return; S.tab = b.dataset.tab; renderTabs(); if (S.tab === 'calc') requestAnimationFrame(() => { drawHero(); place(); window.Body?.start(); }); if (S.tab === 'chal') chalRender(); if (S.tab === 'edu') eduRender(); if (S.tab === 'evid') evidRender(); if (S.tab === 'about') aboutRender(); window.scrollTo({ top: 0 }); };
+$('#tabs').onclick = (e) => { const b = e.target.closest('[data-tab]'); if (!b) return; S.tab = b.dataset.tab; renderTabs(); if (S.tab === 'calc') requestAnimationFrame(() => { drawHero(); place(); layoutBody(); }); if (S.tab === 'chal') chalRender(); if (S.tab === 'edu') eduRender(); if (S.tab === 'evid') evidRender(); if (S.tab === 'about') aboutRender(); window.scrollTo({ top: 0 }); };
 $('#zIn').innerHTML = ic('plus'); $('#zOut').innerHTML = ic('minus');
 
 /* ---------- left column ---------- */
@@ -590,7 +588,7 @@ async function buildPdf() {
   head('Suggested next steps'); if (P.order.length) { txt('Order', { style: 'bold', gap: 2 }); bullets(P.order); }
   if (P.avoid.length) { txt('Avoid', { style: 'bold', gap: 2 }); bullets(P.avoid); } if (P.notes.length) { txt('Also consider', { style: 'bold', gap: 2 }); bullets(P.notes); }
   if (P.script) { head('What to tell the patient'); txt(P.script); }
-  const snap = window.Body?.snapshot?.();
+  const snap = bodySnapshot();
   if (snap && S.sym.size) { const iw = 100, ih = iw * snap.h / snap.w; ensure(ih + 40); head('Selected findings on the body map'); doc.addImage(snap.url, 'JPEG', M, y, iw, ih); y += ih + 6; }
   const n = doc.getNumberOfPages();
   for (let p = 1; p <= n; p++) { doc.setPage(p); doc.setDrawColor(215, 221, 228); doc.line(M, H - 48, W - M, H - 48); doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(107, 116, 128);
@@ -667,9 +665,71 @@ function updateHS() {
     if (e.classList.contains('hsd') && h.opts.length === 1) e.setAttribute('aria-pressed', n > 0);
   });
   if (popI !== null) fillPop(popI);
+  layoutBody();
 }
-function applyView() { renderDial(); requestAnimationFrame(() => { drawHero(); place(); heroState(); }); window.Body?.start(); }
-window.bodyFailed = () => {};
+function applyView() { renderDial(); requestAnimationFrame(() => { drawHero(); place(); heroState(); }); layoutBody(); }
+// marker positions on the static body image, in percent (generated by tools/render-body.html)
+const BODYPOS = /*@BODYPOS*/null;
+// markers follow the body (nudged apart if they collide); each label searches for a free spot so nothing overlaps
+const hsM = [], hsL = [], OFFS = [0]; for (let k = 1; k <= 18; k++) OFFS.push(14 * k, -14 * k);
+const hitR = (a, b) => !(a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y);
+function layoutHS(pts, w, h) {
+  const lines = document.getElementById('hsLines'), pos = (window.HSPOS ||= []);
+  const act = [];
+  for (const p of pts) {
+    const m = (hsM[p.i] ||= document.querySelector(`.hsd[data-hs="${p.i}"]`)), l = (hsL[p.i] ||= document.querySelector(`.hsl[data-hs="${p.i}"]`)); if (!m || !l) continue;
+    p.m = m; p.l = l; p.r = m.offsetWidth / 2 || 12;
+    if (p.x < -8 || p.x > w + 8 || p.y < -8 || p.y > h + 8) p.vis = 0;
+    if (p.vis > .2) act.push(p);
+  }
+  for (let it = 0; it < 5; it++) for (let a = 0; a < act.length; a++) for (let b = a + 1; b < act.length; b++) {
+    const A = act[a], B = act[b], dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy) || .01, min = A.r + B.r + 5;
+    if (d < min) { const k = (min - d) / 2, ux = d < .1 ? 1 : dx / d, uy = d < .1 ? 0 : dy / d; A.x -= ux * k; A.y -= uy * k; B.x += ux * k; B.y += uy * k; }
+  }
+  const obst = [];
+  for (const p of pts) {
+    if (!p.m) continue;
+    pos[p.i] = { x: p.x, y: p.y };
+    p.m.style.transform = `translate(${p.x - p.r}px,${p.y - p.r}px)`; p.m.style.opacity = p.vis; p.m.style.pointerEvents = p.vis > .4 ? 'auto' : 'none';
+    p.w = p.l.offsetWidth; p.lh = p.l.offsetHeight || 30;
+    if (p.vis > .15) obst.push({ x: p.x - p.r - 2, y: p.y - p.r - 2, w: 2 * p.r + 4, h: 2 * p.r + 4, own: p.i });
+  }
+  const placed = []; let svg = '';
+  for (const p of pts.filter((q) => q.m).sort((a, b) => a.y - b.y)) {
+    if (p.vis < .15 || !p.w) { p.l.style.opacity = 0; p.l.style.pointerEvents = 'none'; continue; }
+    const near = Math.abs(p.x - w / 2) < 14, order = near ? [p.side, p.side === 'l' ? 'r' : 'l'] : p.x < w / 2 ? ['l', 'r'] : ['r', 'l'];
+    let best = null, bestScore = 1e9;
+    order.forEach((side, si) => {
+      const lx = side === 'l' ? p.x - p.r - 10 - p.w : p.x + p.r + 10;
+      for (const dy of OFFS) {
+        const ly = Math.min(h - p.lh / 2 - 4, Math.max(p.lh / 2 + 4, p.y + dy)), rect = { x: lx, y: ly - p.lh / 2, w: p.w, h: p.lh };
+        let c = (lx < 2 || lx + p.w > w - 2) ? 5 : 0;
+        for (const o of obst) if (hitR(rect, o)) c++;
+        for (const o of placed) if (hitR(rect, o)) c++;
+        const score = c * 1000 + Math.abs(ly - p.y) + si * 25;
+        if (score < bestScore) { bestScore = score; best = { side, lx, ly }; }
+        if (c === 0) break;
+      }
+    });
+    const { side, lx, ly } = best; placed.push({ x: lx, y: ly - p.lh / 2, w: p.w, h: p.lh });
+    p.l.style.transform = `translate(${lx}px,${ly}px) translateY(-50%)`; p.l.style.opacity = p.vis; p.l.style.pointerEvents = p.vis > .4 ? 'auto' : 'none';
+    if (Math.abs(ly - p.y) > 8) svg += `<path d="M${p.x} ${p.y} L${side === 'l' ? lx + p.w : lx} ${ly}" stroke="#9AA4AF" stroke-width="1" fill="none" opacity="${p.vis}"/>`;
+  }
+  lines.innerHTML = svg;
+}
+function layoutBody() {
+  const box = $('#hs'), w = box.clientWidth, h = box.clientHeight; if (!w || !h || S.tab !== 'calc') return;
+  layoutHS(HS.map((hs, i) => ({ i, x: BODYPOS[i].x / 100 * w, y: BODYPOS[i].y / 100 * h, vis: 1, side: hs.side })), w, h);
+}
+new ResizeObserver(layoutBody).observe($('#bodyBox')); $('#bodyImg').addEventListener('load', layoutBody);
+// small JPEG of the body with the selected regions marked, for the PDF
+function bodySnapshot() {
+  const img = $('#bodyImg'); if (!img.complete || !img.naturalWidth) return null;
+  const w = 360, h = Math.round(w * img.naturalHeight / img.naturalWidth), c = document.createElement('canvas'); c.width = w; c.height = h;
+  const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, w, h); x.drawImage(img, 0, 0, w, h);
+  HS.forEach((hs, i) => { if (!hs.opts.some((id) => S.sym.has(id))) return; x.beginPath(); x.arc(BODYPOS[i].x / 100 * w, BODYPOS[i].y / 100 * h, 7, 0, 7); x.fillStyle = '#F6E27A'; x.fill(); x.lineWidth = 2; x.strokeStyle = '#111418'; x.stroke(); });
+  return { url: c.toDataURL('image/jpeg', .88), w, h };
+}
 
 /* ---------- HEp-2 canvas ---------- */
 const CELLS = [[-.42, -.32, .2, .15, .5], [-.05, -.56, .17, .13, -.3], [-.58, .14, .19, .15, .2], [-.2, .3, .2, .16, -.6], [.05, .03, .14, .11, .9], [.12, .6, .18, .14, .1], [.58, -.4, .17, .13, -.5], [.64, .32, .16, .13, .7]];
@@ -897,7 +957,7 @@ function evidRender() {
    ['Narrow population.', 'Built for adults seen in general or primary care. It excludes established autoimmune disease, most pregnancy care and organ-specific autoimmune disease. Children use rules only, with no estimate, because pediatric evidence is mostly single-centre and retrospective.'],
    ['Inputs that matter are missing.', 'It does not use symptom duration or trend, sex or ancestry beyond what is stated, most laboratory results, imaging, family history detail or the examiner’s overall impression. Missing data are treated as absent.'],
    ['The red-flag list is not exhaustive.', 'No red flag selected does not mean safe. Clinical concern should always override the tool.'],
-   ['Illustrations are not diagnostic images.', 'The microscope view is a procedural drawing. The 3D figure is a simplified anatomy model with approximate marker positions. The photographs are examples only.'],
+   ['Illustrations are not diagnostic images.', 'The microscope view is a procedural drawing. The body picture is a simplified rendering of an anatomy model, with approximate marker positions. The photographs are examples only.'],
    ['Evidence is a snapshot.', 'The evidence was compiled from three source documents and the literature they cite. It is not a living systematic review and may be out of date as soon as new data are published.'],
    ['Regulatory status is unreviewed.', 'Software that informs clinical decisions may count as a medical device or clinical decision support under local regulations. This has not been assessed.'] ];
   $('#view-evid').innerHTML = `
@@ -921,9 +981,9 @@ function evidRender() {
    <section class="card"><p class="meta mb-2" style="color:var(--ink)">The tool is built to be read, checked and improved. The calculation engine, every weight and the build scripts are plain files, and each piece of third-party material keeps its own licence.</p>
     <table class="tbl"><tbody>
      <tr><td>Application code, engine, data files</td><td>MIT licence (file <code>LICENSE</code>): <code>engine.mjs</code>, <code>ana-engine-config.v2.json</code>, <code>cases.json</code>, <code>app.template.html</code>, <code>tools/</code></td></tr>
-     <tr><td>3D anatomy</td><td>Derived from <a href="https://dbarchive.biosciencedbc.jp/en/bodyparts3d/download.html" target="_blank" rel="noopener" style="text-decoration:underline">BodyParts3D</a>, © The Database Center for Life Science, CC BY-SA 2.1 Japan; simplified model shared under the same licence</td></tr>
+     <tr><td>Body image</td><td>Derived from <a href="https://dbarchive.biosciencedbc.jp/en/bodyparts3d/download.html" target="_blank" rel="noopener" style="text-decoration:underline">BodyParts3D</a>, © The Database Center for Life Science, CC BY-SA 2.1 Japan; simplified model shared under the same licence</td></tr>
      <tr><td>Teaching photographs</td><td>Images from Wikimedia Commons and open-access journals under CC0, public domain, CC BY or CC BY-SA; the author and licence are printed under every image</td></tr>
-     <tr><td>Libraries and fonts</td><td>three.js (MIT), Tailwind CSS (MIT), Plus Jakarta Sans (SIL Open Font Licence)</td></tr>
+     <tr><td>Libraries and fonts</td><td>Tailwind CSS (MIT), jsPDF (MIT), Plus Jakarta Sans (SIL Open Font Licence)</td></tr>
      <tr><td>Evidence</td><td>2019 EULAR/ACR SLE, 2013 ACR/EULAR SSc and 2016 ACR/EULAR Sjögren criteria; ICAP nomenclature; Bossuyt 2020; Leuchten 2018; Vulsteke 2021; Tan 1997; Conrad 2017 and others cited in the research report</td></tr>
     </tbody></table></section>
    <h2 class="sec-h">Before any clinical use</h2>
@@ -980,120 +1040,6 @@ renderHS(); renderTabs(); rightShell(); all(); applyView();
   if (!store.get(KT)) setTimeout(window.startTour, 700);
 })();
 </script>
-<script type="module">
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-const box = document.getElementById('bodyBox'), cv = document.getElementById('bc'), note = document.getElementById('bodyNote');
-const MAT = { skin: [0xf0cfc2, .17], skeleton: [0xece6d6, 1], muscles: [0xc4574f, .66], lungs: [0xe8a1aa, .9], kidneys: [0xa8443f, 1], heart: [0xd9534f, 1], liver: [0x9a5545, .9] };
-const GROUP = { skin: ['skin'], muscles: ['muscles'], skeleton: ['skeleton'], organs: ['lungs', 'kidneys', 'heart', 'liver'] };
-const ORDER = { skeleton: 0, lungs: 1, kidneys: 1, heart: 1, liver: 1, muscles: 2, skin: 3 };
-let R, scene, cam, group, anchors = {}, parts = {}, glows = [], yaw = 0, zoom = 1, zt = 1, raf = 0, ready = false, started = false, hsEls = [];
-const V = THREE.Vector3, CAM_BASE = 4.5;
 
-function fail(msg) { note.hidden = false; note.textContent = msg; setTimeout(() => window.bodyFailed?.(), 900); }
-async function init() {
-  try { R = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, powerPreference: 'low-power' }); } catch { return fail('3D is not available on this device. Showing the microscope view.'); }
-  R.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); R.outputColorSpace = THREE.SRGBColorSpace;
-  scene = new THREE.Scene(); cam = new THREE.PerspectiveCamera(28, .8, .1, 30);
-  scene.add(new THREE.HemisphereLight(0xffffff, 0xb9c5d8, 1.25));
-  const key = new THREE.DirectionalLight(0xffffff, 1.7); key.position.set(1.6, 2.6, 3); scene.add(key);
-  const rim = new THREE.DirectionalLight(0xcfe0ff, .9); rim.position.set(-2, 1.2, -2.5); scene.add(rim);
-  group = new THREE.Group(); scene.add(group);
-  try {
-    const g = await new GLTFLoader().loadAsync('assets/anatomy.glb');
-    for (const n of Object.keys(MAT)) {
-      const m = g.scene.getObjectByName(n); if (!m) continue;
-      const [c, o] = MAT[n]; m.material = new THREE.MeshStandardMaterial({ color: c, roughness: .6, metalness: 0, transparent: o < 1, opacity: o, depthWrite: o >= .9 });
-      m.renderOrder = ORDER[n]; parts[n] = m; group.add(m);
-    }
-    const a = g.scene.userData.anchors || g.parser.json.scenes[0].extras.anchors;
-    for (const [k, v] of Object.entries(a)) anchors[k] = new V(...v);
-    anchors.eyes = new V().addVectors(anchors.rEye, anchors.lEye).multiplyScalar(.5); anchors.chin = anchors.mandible;
-  } catch (e) { console.error(e); return fail('Could not load the 3D model. Showing the microscope view.'); }
-  const gm = new THREE.SphereGeometry(.05, 16, 12);
-  window.HS.forEach((h) => { const m = new THREE.Mesh(gm, new THREE.MeshBasicMaterial({ color: 0xe5484d, transparent: true, opacity: .35, depthTest: false })); m.renderOrder = 9; m.visible = false; group.add(m); glows.push(m); });
-  note.hidden = true; ready = true; layers(); resize(); new ResizeObserver(resize).observe(box); frame();
-}
-function layers() { for (const [k, ns] of Object.entries(GROUP)) ns.forEach((n) => parts[n] && (parts[n].visible = S.layers[k])); }
-function resize() { const w = box.clientWidth, h = box.clientHeight; if (!w || !h || !R) return; R.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
-const tmp = new V(), nrm = new V(), toCam = new V();
-function frame(t = 0) {
-  raf = 0; if (!ready || S.tab !== 'calc') { started = false; return; }
-  zoom += (zt - zoom) * .14;
-  const ty = .9, d = (innerWidth < 640 ? 4.0 : CAM_BASE) / zoom;
-  cam.position.set(0, ty + .08, d); cam.lookAt(0, ty, 0); group.rotation.y = yaw; group.updateMatrixWorld(true);
-  const w = box.clientWidth, h = box.clientHeight, pulse = 1 + .12 * Math.sin(t / 380);
-  const pts = [];
-  window.HS.forEach((hs, i) => {
-    const p = anchors[hs.a]; if (!p) return;
-    tmp.set(p.x + hs.d[0], p.y + hs.d[1], p.z + hs.d[2]);
-    glows[i].position.copy(tmp); glows[i].visible = hs.opts.some((id) => S.sym.has(id)); glows[i].scale.setScalar(pulse);
-    const world = tmp.clone().applyMatrix4(group.matrixWorld).project(cam);
-    nrm.set(...hs.n).applyQuaternion(group.quaternion); toCam.set(0, 0, 1);
-    const vis = Math.max(0, Math.min(1, (nrm.dot(toCam) - .05) / .35));
-    pts.push({ i, x: ((world.x + 1) / 2) * w, y: ((1 - world.y) / 2) * h, vis, side: hs.side });
-  });
-  layoutHS(pts, w, h);
-  R.render(scene, cam); raf = requestAnimationFrame(frame);
-}
-// markers follow the body (nudged apart if they collide); each label searches for a free spot so nothing overlaps
-const mk = [], lb = [], OFFS = [0]; for (let k = 1; k <= 18; k++) OFFS.push(14 * k, -14 * k);
-const hitR = (a, b) => !(a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y);
-function layoutHS(pts, w, h) {
-  const lines = document.getElementById('hsLines'), pos = (window.HSPOS ||= []), hsBox = document.getElementById('hs').getBoundingClientRect();
-  const act = [];
-  for (const p of pts) {
-    const m = (mk[p.i] ||= document.querySelector(`.hsd[data-hs="${p.i}"]`)), l = (lb[p.i] ||= document.querySelector(`.hsl[data-hs="${p.i}"]`)); if (!m || !l) continue;
-    p.m = m; p.l = l; p.r = m.offsetWidth / 2 || 12;
-    if (p.x < -8 || p.x > w + 8 || p.y < -8 || p.y > h + 8) p.vis = 0;
-    if (p.vis > .2) act.push(p);
-  }
-  for (let it = 0; it < 5; it++) for (let a = 0; a < act.length; a++) for (let b = a + 1; b < act.length; b++) {
-    const A = act[a], B = act[b], dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy) || .01, min = A.r + B.r + 5;
-    if (d < min) { const k = (min - d) / 2, ux = d < .1 ? 1 : dx / d, uy = d < .1 ? 0 : dy / d; A.x -= ux * k; A.y -= uy * k; B.x += ux * k; B.y += uy * k; }
-  }
-  const obst = [];
-  for (const p of pts) {
-    if (!p.m) continue;
-    pos[p.i] = { x: p.x, y: p.y };
-    p.m.style.transform = `translate(${p.x - p.r}px,${p.y - p.r}px)`; p.m.style.opacity = p.vis; p.m.style.pointerEvents = p.vis > .4 ? 'auto' : 'none';
-    p.w = p.l.offsetWidth; p.lh = p.l.offsetHeight || 30;
-    if (p.vis > .15) obst.push({ x: p.x - p.r - 2, y: p.y - p.r - 2, w: 2 * p.r + 4, h: 2 * p.r + 4, own: p.i });
-  }
-  const placed = []; let svg = '';
-  for (const p of pts.filter((q) => q.m).sort((a, b) => a.y - b.y)) {
-    if (p.vis < .15 || !p.w) { p.l.style.opacity = 0; p.l.style.pointerEvents = 'none'; continue; }
-    const near = Math.abs(p.x - w / 2) < 14, order = near ? [p.side, p.side === 'l' ? 'r' : 'l'] : p.x < w / 2 ? ['l', 'r'] : ['r', 'l'];
-    let best = null, bestScore = 1e9;
-    order.forEach((side, si) => {
-      const lx = side === 'l' ? p.x - p.r - 10 - p.w : p.x + p.r + 10;
-      for (const dy of OFFS) {
-        const ly = Math.min(h - p.lh / 2 - 4, Math.max(p.lh / 2 + 4, p.y + dy)), rect = { x: lx, y: ly - p.lh / 2, w: p.w, h: p.lh };
-        let c = (lx < 2 || lx + p.w > w - 2) ? 3 : 0;
-        for (const o of obst) if (hitR(rect, o)) c++;
-        for (const o of placed) if (hitR(rect, o)) c++;
-        const score = c * 1000 + Math.abs(ly - p.y) + si * 25;
-        if (score < bestScore) { bestScore = score; best = { side, lx, ly }; }
-        if (c === 0) break;
-      }
-    });
-    const { side, lx, ly } = best; placed.push({ x: lx, y: ly - p.lh / 2, w: p.w, h: p.lh });
-    p.l.style.transform = `translate(${lx}px,${ly}px) translateY(-50%)`; p.l.style.opacity = p.vis; p.l.style.pointerEvents = p.vis > .4 ? 'auto' : 'none';
-    if (Math.abs(ly - p.y) > 8) svg += `<path d="M${p.x} ${p.y} L${side === 'l' ? lx + p.w : lx} ${ly}" stroke="#9AA4AF" stroke-width="1" fill="none" opacity="${p.vis}"/>`;
-  }
-  lines.innerHTML = svg;
-}
-window.Body && 0;
-function start() { if (!started && ready) { started = true; resize(); raf = requestAnimationFrame(frame); } }
-cv.addEventListener('pointerdown', () => window.closePop?.());
-window.Body = {
-  start, layers,
-  snapshot: () => { // small white-background JPEG for the PDF
-    if (!ready) return null; R.render(scene, cam); const w = 360, h = Math.round(w * cv.height / cv.width), c = document.createElement('canvas'); c.width = w; c.height = h;
-    const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, w, h); x.drawImage(cv, 0, 0, w, h); return { url: c.toDataURL('image/jpeg', .85), w, h }; },
-};
-window.HS = window.HS || HS;
-init().then(() => { if (ready) start(); });
-</script>
 </body>
 </html>

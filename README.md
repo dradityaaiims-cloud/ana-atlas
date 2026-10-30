@@ -20,14 +20,14 @@ node engine.check.mjs    # engine and challenge-case tests
 | `engine.mjs`, `ana-engine-config.v2.json`, `cases.json` | Calculation engine, weights/titers/patterns (each with an evidence grade), challenge cases |
 | `engine.check.mjs` | Tests |
 | `ANA-Calculator-Research-Report.md` | Evidence synthesis and design decisions |
-| `assets/anatomy.glb` | 3D anatomy (BodyParts3D, CC BY-SA 2.1 Japan) |
+| `assets/body.webp`, `assets/body-markers.json` | Static body image (rendered from BodyParts3D, CC BY-SA 2.1 Japan) and the marker positions on it |
 | `assets/edu/`, `assets/edu/credits.json` | Education images with author and licence for each |
 | `assets/about/` | About photo |
-| `tools/` | Reproducible asset builders: `build-anatomy.mjs`, `fetch-edu-images.mjs`, `external-figures.json` (the latter needs ImageMagick) |
+| `tools/` | Asset builders: `build-anatomy.mjs` (3D source into `tools/.cache/`, not committed), `render-body.html` (renders the body image and marker positions; change marker offsets in `app.template.html`, then re-render), `fetch-edu-images.mjs` + `external-figures.json` (education images; needs ImageMagick) |
 
 ## Deploy
 Static site, no build step. On Netlify: *Add new site → Import from Git*, pick this repo; `netlify.toml` sets the publish folder.
-Runtime CDNs: Google Fonts, Tailwind (Play CDN), three.js (pinned), jsPDF (loaded on first PDF export).
+Runtime CDNs: Google Fonts, Tailwind (Play CDN), jsPDF (loaded on first PDF export). The body is a static image, so the page needs no 3D library.
 
 ## Licences
-Code and data files: MIT (`LICENSE`). The 3D model and the education images keep their own licences: see `ATTRIBUTION.md` and `assets/edu/credits.json`.
+Code and data files: MIT (`LICENSE`). The body image and the education images keep their own licences: see `ATTRIBUTION.md` and `assets/edu/credits.json`.

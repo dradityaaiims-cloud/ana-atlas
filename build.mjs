@@ -5,6 +5,7 @@ const json = (f) => JSON.stringify(JSON.parse(r(f)));
 const out = r("./app.template.html")
   .replace("/*@CONFIG*/null", () => json("./ana-engine-config.v2.json"))
   .replace("/*@CASES*/null", () => json("./cases.json"))
+  .replace("/*@BODYPOS*/null", () => json("./assets/body-markers.json"))
   .replace("/*@CREDITS*/null", () => json("./assets/edu/credits.json"))
   .replace("/*@ENGINE*/", () => r("./engine.mjs").replace(/^export /gm, ""));
 writeFileSync(new URL("./index.html", import.meta.url), out);

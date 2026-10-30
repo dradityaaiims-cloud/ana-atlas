@@ -1,4 +1,4 @@
-// Builds assets/anatomy.glb from BodyParts3D (DBCLS) using HTTP range requests, so only the
+// Builds tools/.cache/anatomy.glb (the 3D source for tools/render-body.html) from BodyParts3D (DBCLS) using HTTP range requests, so only the
 // selected parts are downloaded (not the 143 MB archive). No dependencies.
 // Usage: node tools/build-anatomy.mjs [cacheDir]      (cache keeps raw OBJs between runs)
 // Data: BodyParts3D, (c) The Database Center for Life Science, CC BY-SA 2.1 Japan (see ATTRIBUTION.md).
@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 const BASE = "https://dbarchive.biosciencedbc.jp/data/bodyparts3d/LATEST";
 const ZIP = `${BASE}/isa_BP3D_4.0_obj_99.zip`;
 const cache = process.argv[2] ?? join(fileURLToPath(new URL(".", import.meta.url)), ".cache");
-const out = fileURLToPath(new URL("../assets/", import.meta.url));
+const out = fileURLToPath(new URL("./.cache/", import.meta.url));
 mkdirSync(cache, { recursive: true }); mkdirSync(out, { recursive: true });
 
 const get = async (url, range) => {

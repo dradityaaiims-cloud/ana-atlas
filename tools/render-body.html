@@ -1,0 +1,39 @@
+<!doctype html>
+<meta charset="utf-8"><title>Render the static body image</title>
+<!-- One-off tool: renders tools/.cache/anatomy.glb (see build-anatomy.mjs) into assets/body.webp and the marker positions in
+     assets/body-markers.json. Open via `node serve.mjs` at /tools/render-body.html, then save the two download links.
+     Add ?post=http://localhost:PORT to POST the results to a local receiver instead. Marker offsets come from the HS array in app.template.html. -->
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
+<body style="font:14px system-ui;background:#e8edf3;margin:16px"><p id="log">Rendering…</p><div id="links"></div><canvas id="c" style="max-width:360px;display:block;background:#fff"></canvas>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+const W = 1000, H = 1250, DIST = 4.2, FOV = 28;
+const MAT = { skin: [0xf0cfc2, .17], skeleton: [0xece6d6, 1], muscles: [0xc4574f, .66], lungs: [0xe8a1aa, .9], kidneys: [0xa8443f, 1], heart: [0xd9534f, 1], liver: [0x9a5545, .9] };
+const ORDER = { skeleton: 0, lungs: 1, kidneys: 1, heart: 1, liver: 1, muscles: 2, skin: 3 };
+const log = (t) => (document.getElementById('log').textContent = t);
+const tpl = await (await fetch('/app.template.html')).text();
+const HS = new Function('return ' + tpl.match(/const HS = (\[[\s\S]*?\}\]);\n/)[1])();
+const R = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true, alpha: true, preserveDrawingBuffer: true });
+R.setPixelRatio(1); R.setSize(W, H, false); R.outputColorSpace = THREE.SRGBColorSpace;
+const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(FOV, W / H, .1, 30);
+scene.add(new THREE.HemisphereLight(0xffffff, 0xb9c5d8, 1.25));
+const key = new THREE.DirectionalLight(0xffffff, 1.7); key.position.set(1.6, 2.6, 3); scene.add(key);
+const rim = new THREE.DirectionalLight(0xcfe0ff, .9); rim.position.set(-2, 1.2, -2.5); scene.add(rim);
+const gltf = await new GLTFLoader().loadAsync('/tools/.cache/anatomy.glb');
+for (const [n, [c, o]] of Object.entries(MAT)) { const m = gltf.scene.getObjectByName(n); if (!m) continue;
+  m.material = new THREE.MeshStandardMaterial({ color: c, roughness: .6, metalness: 0, transparent: o < 1, opacity: o, depthWrite: o >= .9 }); m.renderOrder = ORDER[n]; scene.add(m); }
+const A = {}; for (const [k, v] of Object.entries(gltf.parser.json.scenes[0].extras.anchors)) A[k] = new THREE.Vector3(...v);
+A.eyes = new THREE.Vector3().addVectors(A.rEye, A.lEye).multiplyScalar(.5); A.chin = A.mandible;
+cam.position.set(0, .98, DIST); cam.lookAt(0, .9, 0); cam.updateMatrixWorld(); cam.updateProjectionMatrix();
+R.render(scene, cam);
+const markers = HS.map((h) => { const a = A[h.a], p = new THREE.Vector3(a.x + h.d[0], a.y + h.d[1], a.z + h.d[2]).project(cam);
+  return { x: +(((p.x + 1) / 2) * 100).toFixed(2), y: +(((1 - p.y) / 2) * 100).toFixed(2) }; });
+const png = document.getElementById('c').toDataURL('image/png');
+window.__result = { png, markers };
+const post = new URLSearchParams(location.search).get('post');
+if (post) { await fetch(post + '/body.png', { method: 'POST', body: await (await fetch(png)).blob() }); await fetch(post + '/body-markers.json', { method: 'POST', body: JSON.stringify(markers) }); }
+const a1 = Object.assign(document.createElement('a'), { href: png, download: 'body.png', textContent: 'body.png ' });
+const a2 = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([JSON.stringify(markers)])), download: 'body-markers.json', textContent: ' body-markers.json' });
+document.getElementById('links').append(a1, a2); log(`Rendered ${W}x${H}; ${markers.length} markers${post ? ' (posted)' : ''}.`);
+</script>

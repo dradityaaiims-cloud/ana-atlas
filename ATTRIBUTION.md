@@ -1,12 +1,12 @@
 # Attribution
 
-**3D anatomy (`assets/anatomy.glb`)** — derived from *BodyParts3D*, © The Database Center for Life Science (DBCLS),
+**Body image (`assets/body.webp`)** — rendered from a 3D model derived from *BodyParts3D*, © The Database Center for Life Science (DBCLS),
 licensed under Creative Commons Attribution-ShareAlike 2.1 Japan
 (<https://creativecommons.org/licenses/by-sa/2.1/jp/>). Source: <https://dbarchive.biosciencedbc.jp/en/bodyparts3d/download.html>.
 
 Changes: selected skin, skeleton, 30 large muscles, lungs, kidneys, heart and liver; units converted to metres; reoriented;
-simplified by vertex clustering; quantised and merged into one glTF binary by `tools/build-anatomy.mjs`.
-The derived model is shared under the same CC BY-SA 2.1 Japan terms. Application code is separate.
+simplified by vertex clustering (`tools/build-anatomy.mjs`), then rendered once to a still image (`tools/render-body.html`).
+The image is shared under the same CC BY-SA 2.1 Japan terms. Application code is separate.
 
 **Teaching photographs (`assets/edu/`)** — downloaded from Wikimedia Commons by `tools/fetch-edu-images.mjs`, resized for the web, and
 filtered to CC0, public domain, CC BY and CC BY-SA files only. Author, licence and source page for every image are in
