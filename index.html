@@ -1,0 +1,1283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ANA Atlas by Dr. Misurya</title>
+<meta name="description" content="Interactive decision support for interpreting a positive ANA: pre-test probability, titer, ICAP pattern and next steps.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>
+tailwind.config = { theme: { extend: {
+  fontFamily: { sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'] },
+  colors: { page: 'var(--page)', surface: 'var(--surface)', ink: 'var(--ink)', ink2: 'var(--ink2)', ink3: 'var(--ink3)',
+            accent: 'var(--accent)', coral: 'var(--coral)', cobalt: 'var(--cobalt)', good: 'var(--good)', well: 'var(--well)' } } } };
+</script>
+<style>
+:root{
+  --page:#D9E1EA; --surface:#E8EDF3; --card:rgba(255,255,255,.78); --card-solid:#F7F9FB; --well:#EEF1F5;
+  --ink:#111418; --ink2:#6B7480; --ink3:#A3ABB5;
+  --accent:#F6E27A; --coral:#E5484D; --cobalt:#2563EB; --good:#22A06B;
+  --pink-1:#F7C6CF; --pink-2:#F08A96;
+  --r-card:22px; --r-frame:36px;
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px rgba(16,24,40,.04);
+  --shadow-hover:0 2px 4px rgba(16,24,40,.05),0 12px 30px rgba(16,24,40,.07);
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--page);color:var(--ink);font-family:"Plus Jakarta Sans",Inter,system-ui,sans-serif;font-weight:400;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
+button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--cobalt);outline-offset:2px}
+.page{padding:clamp(8px,2vw,28px)}
+.frame{max-width:1500px;margin:0 auto;background:var(--surface);border-radius:var(--r-frame);border:1px solid rgba(255,255,255,.85);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.45),0 24px 60px rgba(16,24,40,.06);padding:clamp(14px,2.2vw,28px);position:relative;overflow:hidden}
+/* top bar */
+.topbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;font-weight:600;font-size:16px;letter-spacing:-.01em}
+.logo i{width:34px;height:34px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:var(--shadow)}
+.tabs{display:flex;gap:6px;margin:0 auto;flex-wrap:wrap;justify-content:center}
+.tab{height:42px;padding:0 18px;border-radius:999px;background:rgba(255,255,255,.6);display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2);transition:all .25s var(--ease)}
+.tab:hover{background:#fff}
+.tab[aria-selected=true]{background:#fff;color:var(--ink);font-weight:500;box-shadow:var(--shadow)}
+.tab svg{display:none;width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}.tab[aria-selected=true] svg{display:block}
+.ibtn{width:40px;height:40px;border-radius:50%;background:#fff;display:grid;place-items:center;transition:all .25s var(--ease);flex:none;box-shadow:var(--shadow)}
+.ibtn:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover)}
+.ibtn.grey{background:#DDE3EA;box-shadow:none}
+.ibtn svg,.ico svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.user{display:flex;align-items:center;gap:10px;padding-left:4px}
+.avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#F6E27A,#F7C6CF);display:grid;place-items:center;font-weight:500;font-size:14px}
+.user b{display:block;font-weight:500;font-size:14px;line-height:1.1}.user small{font-size:11px;color:var(--ink3)}
+h1.title{font-weight:500;letter-spacing:-.02em;line-height:1.02;font-size:clamp(40px,5.6vw,72px);margin:clamp(14px,2vw,26px) 0 0}
+h1.title span{display:block}h1.title span+span{color:var(--ink2)}
+/* cards */
+.card{background:var(--card);border-radius:var(--r-card);padding:18px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.6);
+  backdrop-filter:blur(8px);transition:transform .25s var(--ease),box-shadow .25s var(--ease);position:relative;min-width:0}
+.card:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover)}
+.card-h{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.card-h h3{margin:0;font-size:14.5px;font-weight:500;line-height:1.2}
+.ico{width:30px;height:30px;border-radius:50%;background:var(--well);display:grid;place-items:center;color:var(--ink2);flex:none}
+.ico svg{width:16px;height:16px}
+.meta{font-size:11.5px;color:var(--ink2);line-height:1.45}
+.meta.t{color:var(--ink3)}
+.big{font-size:clamp(28px,3vw,38px);font-weight:500;letter-spacing:-.02em;line-height:1}
+.unit{font-size:13px;color:var(--ink2);font-weight:400;margin-left:4px;letter-spacing:0}
+.well{background:var(--well);border-radius:16px;padding:12px}
+.pill{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:999px;font-size:11px;font-weight:500;white-space:nowrap}
+.pill i{width:6px;height:6px;border-radius:50%;background:currentColor}
+.pill.y{background:#FBF1B4;color:#7A6A12}.pill.b{background:#DCE8FB;color:#2F55A6}.pill.g{background:#D7F0E3;color:#1B7A52}
+.pill.r{background:#FBDDDE;color:#B3282D}.pill.k{background:var(--ink);color:#fff}
+.kebab{width:28px;height:28px;border-radius:50%;background:var(--well);display:grid;place-items:center;color:var(--ink2)}
+.kebab svg{width:14px;height:14px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border-radius:999px;background:var(--well);font-size:12.5px;line-height:1.15;color:var(--ink);
+  transition:all .2s var(--ease);text-align:left;border:1px solid transparent}
+.chip:hover{background:#fff;transform:translateY(-1px)}
+.chip[aria-pressed=true]{background:var(--accent);border-color:rgba(0,0,0,.04);font-weight:500}
+.chip.warn[aria-pressed=true]{background:#FBDDDE;color:#9C2227}
+.chip.sm{padding:6px 10px;font-size:12px}
+.group-l{font-size:11px;color:var(--ink3);margin:12px 0 6px}
+.group-l:first-child{margin-top:0}
+.seg{display:inline-flex;background:var(--well);border-radius:999px;padding:3px}
+.seg button{white-space:nowrap;padding:6px 12px;border-radius:999px;font-size:12px;color:var(--ink2);transition:all .2s var(--ease)}
+.seg button[aria-pressed=true]{background:#fff;color:var(--ink);font-weight:500;box-shadow:var(--shadow)}
+.scroll{overflow:auto;max-height:430px;margin:0 -6px;padding:0 6px}
+.scroll::-webkit-scrollbar{width:6px}.scroll::-webkit-scrollbar-thumb{background:#D3DAE2;border-radius:6px}
+.cta{display:flex;align-items:center;justify-content:space-between;gap:8px;height:52px;border-radius:999px;background:var(--accent);padding:0 6px 0 22px;font-weight:500;font-size:14.5px;
+  transition:all .25s var(--ease);width:100%;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.cta:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover)}
+.cta .go{width:40px;height:40px;border-radius:50%;background:#fff;display:grid;place-items:center}
+.cta .go svg{width:18px;height:18px;stroke:var(--ink);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.cta[disabled]{opacity:.45;pointer-events:none}
+/* tubes */
+.tubes{display:flex;gap:6px;justify-content:space-between;align-items:flex-end}
+.tube{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.tube .glass{width:100%;max-width:30px;height:74px;border-radius:6px 6px 15px 15px;background:#fff;border:1px solid #DCE2E9;position:relative;overflow:hidden;transition:all .25s var(--ease)}
+.tube .fill{position:absolute;left:0;right:0;bottom:0;background:var(--pink-1);transition:height .5s var(--ease),background .3s}
+.tube[aria-pressed=true] .glass{border-color:var(--ink);box-shadow:0 0 0 3px var(--accent)}
+.tube:hover .glass{transform:translateY(-2px)}
+.tube small{font-size:10.5px;color:var(--ink2);white-space:nowrap}
+.tube[aria-pressed=true] small{color:var(--ink);font-weight:500}
+.rail{height:6px;border-radius:6px;background:#E1E6EC;position:relative}
+.rail b{position:absolute;left:0;top:0;bottom:0;border-radius:6px;transition:width .5s var(--ease)}
+/* hero */
+.hero{position:relative;width:min(100%,640px);margin:0 auto;aspect-ratio:1}
+.disc{position:absolute;inset:3.5%;border-radius:50%;overflow:hidden;box-shadow:0 0 0 10px rgba(255,255,255,.55),0 0 0 11px rgba(255,255,255,.9),0 24px 60px rgba(16,24,40,.12);background:#0b161d}
+.disc canvas{width:100%;height:100%;display:block}
+.hero-note{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:20%;color:#CFE9DA;font-size:13px;pointer-events:none}
+.callout{position:absolute;display:flex;align-items:center;gap:8px;background:#fff;border-radius:999px;padding:8px 14px 8px 11px;font-size:12px;box-shadow:var(--shadow-hover);z-index:3;max-width:210px;transition:opacity .3s}
+.callout i{width:8px;height:8px;border-radius:50%;flex:none}
+.hot{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;border:1.5px solid #fff;z-index:3;display:grid;place-items:center;background:rgba(255,255,255,.18);backdrop-filter:blur(2px);transition:left .4s var(--ease),top .4s var(--ease)}
+.hot::before{content:"";width:7px;height:7px;border-radius:50%;background:#fff}
+.hot::after{content:"";position:absolute;inset:-1px;border-radius:50%;border:1.5px solid rgba(255,255,255,.8);animation:pulse 2.4s ease-out infinite}
+@keyframes pulse{0%{transform:scale(1);opacity:.9}100%{transform:scale(2.1);opacity:0}}
+.zoom{position:absolute;right:-6px;top:38%;display:flex;flex-direction:column;gap:8px;z-index:4}
+svg.lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
+.dial{width:min(100%,560px);margin:-4px auto 0;touch-action:none;user-select:none;display:block}
+.dial:focus-visible{outline:2px solid var(--cobalt);outline-offset:2px;border-radius:18px}
+.dial .tick{stroke:#B6BEC8;stroke-width:1.5;stroke-linecap:round;transition:stroke .2s}
+.dial .tick.on{stroke:var(--ink)}
+.pinfo{text-align:center;margin:0 auto;max-width:520px}
+.pinfo h2{font-size:clamp(20px,2.2vw,26px);font-weight:500;letter-spacing:-.01em;margin:6px 0 4px}
+/* gauge */
+.gauge{position:relative;width:100%;max-width:300px;margin:0 auto}
+.gauge svg{width:100%;display:block}
+.gauge line{stroke-linecap:round;stroke-width:5.5;transition:stroke .35s var(--ease);transition-delay:calc(var(--i)*14ms)}
+.gauge .mid{position:absolute;left:0;right:0;bottom:6%;text-align:center}
+.legend{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;font-size:11px;color:var(--ink2);margin-top:10px}
+.legend span{display:flex;align-items:center;gap:5px}.legend i{width:8px;height:8px;border-radius:50%}
+.spark path{stroke-dasharray:400;stroke-dashoffset:400;animation:draw 1.2s var(--ease) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.lolli{display:grid;grid-template-columns:78px 1fr 40px;gap:8px;align-items:center;font-size:12px;margin:10px 0}
+.lolli .rail{height:3px;background:#DDE3EA;overflow:visible}
+.lolli .dot{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--coral);box-shadow:0 0 0 4px rgba(229,72,77,.16);transition:left .5s var(--ease)}
+.lolli .dot.c{background:var(--cobalt);box-shadow:0 0 0 4px rgba(37,99,235,.14)}
+.list{margin:0;padding:0;list-style:none;font-size:13px}
+.list li{display:flex;gap:9px;padding:6px 0;align-items:flex-start;line-height:1.35}
+.list li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ink);margin-top:6px;flex:none}
+.list.no li::before{background:var(--coral)}
+.list.note li::before{background:var(--cobalt)}
+.delta{font-size:11.5px;font-weight:500}.delta.up{color:var(--coral)}.delta.dn{color:var(--good)}
+.enter{animation:rise .5s var(--ease) both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.btn-big{flex:1;min-width:140px;padding:14px 16px;border-radius:18px;background:var(--well);font-size:14px;font-weight:500;transition:all .2s var(--ease);text-align:center}
+.btn-big:hover{background:#fff;transform:translateY(-2px)}
+.btn-big[aria-pressed=true]{background:var(--accent)}
+.btn-big[disabled]{pointer-events:none;opacity:.6}
+.foot{margin:18px 4px 2px;font-size:11px;color:var(--ink3);line-height:1.5;max-width:900px}
+@media (min-width:1400px){
+  .hero-wrap{position:sticky;top:18px;z-index:5}
+  .center-grid{grid-template-columns:minmax(0,1.45fr) minmax(0,1fr)}
+}
+@media (max-width:1023px){ .zoom{right:4px} .callout{max-width:150px;font-size:11px} }
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* body map + responsive */
+.hero-bar{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.layers{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.layers .chip{padding:6px 11px;font-size:12px;background:rgba(255,255,255,.7)}
+.hero[data-mode=body]{aspect-ratio:.8;width:min(100%,520px)}
+.hero[data-mode=body] .scope-only,.hero[data-mode=scope] .body-only{display:none}
+.center-grid{display:grid;gap:12px;align-items:start}
+.scope-card{padding:16px}
+#scope{width:100%;max-width:330px;margin:0 auto;aspect-ratio:1}
+.scope-body{display:grid;gap:12px;align-items:center}
+@media (min-width:640px) and (max-width:1399px){.scope-body{grid-template-columns:minmax(0,330px) minmax(0,1fr);gap:20px}}
+.scope-desc{display:grid;gap:10px}
+.scope-desc .sd{display:flex;gap:10px;align-items:flex-start;background:var(--well);border-radius:16px;padding:10px 12px}
+.scope-desc .sd i{width:8px;height:8px;border-radius:50%;flex:none;margin-top:6px}
+.scope-desc b{display:block;font-size:11px;font-weight:500;color:var(--ink3);margin-bottom:1px}
+.scope-desc span{font-size:13px;line-height:1.4}
+.scope-card .dial{margin-top:2px}.scope-card .pinfo h2{font-size:clamp(18px,2vw,22px)}
+#bc{touch-action:auto;cursor:default}
+#bodyBox{position:absolute;inset:0}
+#bc{width:100%;height:100%;display:block}
+#hs{position:absolute;inset:0;pointer-events:none;z-index:4}
+#hs svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.hsd,.hsl{position:absolute;left:0;top:0;pointer-events:auto;will-change:transform;transition:opacity .25s,background .25s,box-shadow .25s}
+.hsd{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.35);border:1.5px solid #fff;backdrop-filter:blur(2px);display:grid;place-items:center;box-shadow:0 2px 8px rgba(16,24,40,.12)}
+.hsd::before{content:"";width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 0 1px rgba(16,24,40,.2);transition:background .25s}
+.hsd::after{content:"";position:absolute;inset:-1px;border-radius:50%;border:1.5px solid rgba(255,255,255,.9);animation:pulse 2.6s ease-out infinite}
+.hsd.on{background:var(--accent)}.hsd.on::before{background:var(--ink)}.hsd.on::after{border-color:var(--accent)}
+.hsl{display:flex;align-items:center;gap:7px;background:#fff;border-radius:999px;padding:7px 12px 7px 10px;font-size:12px;white-space:nowrap;box-shadow:var(--shadow-hover);cursor:pointer}
+.hsl::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--coral);flex:none}.hsl.alt::before{background:var(--cobalt)}
+.hsl.on{background:var(--accent);font-weight:500}
+.hsl .sh{display:none}
+.hsl .cnt{font-style:normal;font-size:10.5px;background:rgba(17,20,24,.12);border-radius:999px;padding:1px 6px}
+.hsl:hover,.hsd:hover{box-shadow:0 2px 6px rgba(16,24,40,.1),0 12px 28px rgba(16,24,40,.16)}
+.pop{position:absolute;z-index:9;width:min(256px,calc(100% - 12px));background:rgba(255,255,255,.98);backdrop-filter:blur(10px);border-radius:20px;padding:12px;box-shadow:0 1px 2px rgba(16,24,40,.05),0 16px 40px rgba(16,24,40,.16);pointer-events:auto}
+.pop h5{margin:0 0 8px;font-size:12px;font-weight:500;color:var(--ink2)}
+.cta2{display:flex;align-items:center;justify-content:center;gap:8px;height:46px;border-radius:999px;background:#fff;width:100%;font-size:14px;font-weight:500;box-shadow:var(--shadow);transition:all .25s var(--ease)}
+.cta2:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover)}.cta2 svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.about{display:grid;gap:18px;padding:22px}@media (min-width:768px){.about{grid-template-columns:200px 1fr;gap:28px;padding:28px}}
+.about img{width:100%;max-width:200px;aspect-ratio:1;object-fit:cover;border-radius:28px;box-shadow:var(--shadow-hover)}
+.about h2{margin:0;font-size:clamp(26px,4vw,36px);font-weight:500;letter-spacing:-.02em}
+.about p{margin:0;font-size:14px;line-height:1.6;color:var(--ink2)}
+.hero-note.body{color:var(--ink2);background:none}
+@media (max-width:1023px){ .frame{border-radius:28px} }
+@media (max-width:640px){
+  .page{padding:6px}.frame{padding:12px;border-radius:24px}
+  .logo{order:1}
+  .tabs{order:3;flex-basis:100%;margin:0;flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+  .tabs::-webkit-scrollbar{display:none}.tab{flex:none;height:40px;padding:0 14px}
+  .hsl{display:none}.hsl.on{display:flex;font-size:11px;padding:5px 9px 5px 8px}.hsl .full{display:none}.hsl .sh{display:inline}
+  .hsd{width:28px;height:28px}
+  .zoom{right:0;top:30%}.ibtn{width:38px;height:38px}
+  .card{padding:16px}.scroll{max-height:340px}
+  .tube small{font-size:9.5px}.chip{font-size:12px}
+  .btn-big{min-width:100%}
+}
+@media (min-width:641px) and (max-width:1023px){ .hero-wrap{margin-bottom:6px} }
+#mbar{position:fixed;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));z-index:40;display:none;align-items:center;justify-content:space-between;gap:10px;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-radius:999px;padding:8px 8px 8px 16px;box-shadow:0 1px 2px rgba(16,24,40,.05),0 10px 30px rgba(16,24,40,.08);border:1px solid rgba(255,255,255,.8)}
+#mbar .mb-l{display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap}
+#mbar .mb-go{width:40px;height:40px;border-radius:50%;background:var(--accent);display:grid;place-items:center;flex:none}
+#mbar .mb-go svg{width:18px;height:18px;stroke:var(--ink);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transform:rotate(90deg)}
+@media (max-width:1023px){ #mbar.on{display:flex} .foot{margin-bottom:76px} }
+/* education + model */
+.sec-h{font-size:clamp(22px,2.6vw,30px);font-weight:500;letter-spacing:-.02em;margin:26px 4px 2px}
+.sec-p{margin:0 4px 14px;font-size:13.5px;color:var(--ink2);max-width:760px;line-height:1.5}
+.figs{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.fig{padding:10px 10px 14px;display:flex;flex-direction:column;gap:10px}
+.fig .im{display:block;border-radius:16px;overflow:hidden;background:var(--well);aspect-ratio:4/3;width:100%}
+.fig img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s var(--ease)}
+.fig .im:hover img{transform:scale(1.04)}
+.fig h4{margin:0;font-size:14.5px;font-weight:500;padding:0 4px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.fig p{margin:0;padding:0 4px;font-size:12.5px;line-height:1.5;color:var(--ink2)}
+.cr{font-size:10.5px;line-height:1.4;color:var(--ink3);padding:0 4px}.cr a{text-decoration:underline}
+#lb{border:0;border-radius:24px;padding:12px;max-width:min(94vw,960px);width:100%;background:var(--card-solid);box-shadow:0 20px 60px rgba(16,24,40,.2);position:fixed}
+#lb::backdrop{background:rgba(17,20,24,.45)}
+#lb img{width:100%;max-height:78vh;object-fit:contain;border-radius:16px;display:block;background:#0b161d}
+#lb .cr{padding:10px 4px 2px;font-size:11.5px}
+#lbX{position:absolute;right:18px;top:18px;font-size:22px;line-height:1;z-index:2}
+.notice{background:#FFF8D6;border:1px solid #F1E3A0}
+.notice h3{font-size:16px}
+.cols{display:grid;gap:12px}@media (min-width:768px){.cols.c2{grid-template-columns:1fr 1fr}.cols.c3{grid-template-columns:repeat(3,1fr)}}
+.ol{margin:0;padding:0;list-style:none;counter-reset:n;font-size:13px}
+.ol li{counter-increment:n;display:grid;grid-template-columns:28px 1fr;gap:8px;padding:9px 0;border-top:1px solid rgba(16,24,40,.06);line-height:1.5}
+.ol li:first-child{border-top:0}
+.ol li::before{content:counter(n);width:22px;height:22px;border-radius:50%;background:var(--well);display:grid;place-items:center;font-size:11px;color:var(--ink2);margin-top:1px}
+.ol b{font-weight:600}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px}.kv span:nth-child(odd){color:var(--ink2)}
+.tbl{width:100%;font-size:12.5px;border-collapse:collapse}.tbl td{padding:8px 4px;border-top:1px solid rgba(16,24,40,.06);vertical-align:top}.tbl td:first-child{color:var(--ink2);white-space:nowrap;padding-right:14px}
+/* tutorial + Boba */
+#tour{border:0;border-radius:32px;padding:0;width:min(94vw,520px);max-height:94vh;background:var(--surface);box-shadow:inset 0 0 0 1px rgba(255,255,255,.7),0 30px 80px rgba(16,24,40,.22);overflow:auto;color:var(--ink)}
+#tour::backdrop{background:rgba(17,20,24,.45);backdrop-filter:blur(3px)}
+.tour-in{padding:22px;display:flex;flex-direction:column;gap:14px}
+.tour-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tour-art{height:160px;border-radius:24px;background:linear-gradient(145deg,#fff,#EEF1F5);display:grid;place-items:center;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.tour-art .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:0 16px}
+.tour-art .big-ico{width:76px;height:76px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:var(--shadow-hover)}
+.tour-art .big-ico svg{width:34px;height:34px;stroke:var(--ink);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#tour h2{font-size:clamp(24px,5.5vw,31px);font-weight:500;letter-spacing:-.02em;margin:0;line-height:1.1}
+#tour p{margin:0;font-size:14px;line-height:1.55;color:var(--ink2)}
+#tour p.note{font-size:12px;color:var(--ink3);padding:10px 12px;border-radius:14px;background:var(--well)}
+.dots{display:flex;gap:6px;align-items:center}.dots i{width:7px;height:7px;border-radius:7px;background:#CBD3DC;transition:all .3s var(--ease)}.dots i.on{width:22px;background:var(--ink)}
+.tour-foot{display:flex;align-items:center;gap:10px}
+.tour-foot .cta{height:48px;flex:1}
+.tour-foot .ghost{height:48px;padding:0 16px;border-radius:999px;background:var(--well);font-size:14px;transition:all .2s var(--ease)}
+.tour-foot .ghost:hover{background:#fff}
+.link{background:none;border:0;padding:0;font:inherit;color:inherit;text-decoration:underline;cursor:pointer}
+.mini-tubes{display:flex;gap:7px;align-items:flex-end}.mini-tubes i{width:20px;border-radius:5px 5px 11px 11px;background:#fff;border:1px solid #DCE2E9;position:relative;overflow:hidden;display:block}
+.mini-tubes i::after{content:"";position:absolute;left:0;right:0;bottom:0;height:var(--f);background:var(--c)}
+.mini-tubes i.sel{box-shadow:0 0 0 3px var(--accent);border-color:var(--ink)}
+.boba{position:fixed;right:14px;bottom:14px;z-index:60;display:flex;flex-direction:column;align-items:flex-end;gap:8px;pointer-events:none}
+.boba>*{pointer-events:auto}
+body:has(#mbar.on) .boba{bottom:84px}
+.boba-dog{position:relative;width:92px;height:92px;padding:0;border:0;background:transparent;cursor:pointer;transform-origin:50% 90%;filter:drop-shadow(0 6px 10px rgba(16,24,40,.14))}
+.boba-dog img{width:100%;height:100%;image-rendering:pixelated;user-select:none;-webkit-user-drag:none}
+.boba-bubble{position:relative;width:min(330px,calc(100vw - 28px));background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.9);border-radius:22px;padding:16px;font-size:13.5px;line-height:1.5;box-shadow:0 1px 2px rgba(16,24,40,.05),0 14px 36px rgba(16,24,40,.12)}
+.boba-bubble::after{content:"";position:absolute;right:38px;bottom:-7px;width:14px;height:14px;background:rgba(255,255,255,.97);transform:rotate(45deg);border-radius:3px}
+.boba-name{font-size:11px;color:var(--ink3);margin:0 0 4px}
+.boba-text{margin:0 30px 10px 0;white-space:pre-line}
+.boba-x{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;background:var(--well);font-size:16px;line-height:1;color:var(--ink2)}
+.boba-btns{display:flex;flex-wrap:wrap;gap:6px}
+.boba-btns>*{font:inherit;font-size:12.5px;color:var(--ink);background:var(--well);border:0;border-radius:999px;padding:7px 12px;cursor:pointer;text-decoration:none;transition:background .2s}
+.boba-btns>*:hover{background:var(--accent)}
+.boba-zzz{position:absolute;top:0;right:0;font-size:13px;color:var(--ink2);opacity:0;letter-spacing:2px}
+.boba-dog.nap{opacity:.85;transform:translateY(6px) scale(.95)}.boba-dog.nap .boba-zzz{opacity:1;animation:boba-zzz 2s ease-in-out infinite}
+.boba-dog.wag{animation:boba-wag .9s ease-in-out}.boba-dog.hop{animation:boba-hop .5s ease-out}.boba-dog.zoom{animation:boba-zoom 1.4s ease-in-out}
+@keyframes boba-wag{0%,100%{transform:rotate(0)}20%{transform:rotate(-6deg)}40%{transform:rotate(6deg)}60%{transform:rotate(-5deg)}80%{transform:rotate(4deg)}}
+@keyframes boba-hop{0%{transform:translateY(0)}40%{transform:translateY(-16px)}100%{transform:translateY(0)}}
+@keyframes boba-zoom{0%{transform:translateX(0)}30%{transform:translateX(-200px) scaleX(-1)}60%{transform:translateX(-100px) scaleX(1)}100%{transform:translateX(0)}}
+@keyframes boba-zzz{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(-6px);opacity:.4}}
+@media (prefers-reduced-motion:reduce){.boba-dog.wag,.boba-dog.hop,.boba-dog.zoom,.boba-dog.nap .boba-zzz{animation:none!important}}
+@media (max-width:640px){.boba-dog{width:64px;height:64px}.boba{right:10px}.boba-bubble{padding:14px}.tour-art{height:130px}}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="page">
+ <div class="frame">
+  <header class="topbar">
+   <div class="logo"><i><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111418" stroke-width="1.5"><circle cx="12" cy="12" r="8"/><circle cx="9.5" cy="10.5" r="1.2" fill="#E5484D" stroke="none"/><circle cx="14" cy="13.5" r="1.2" fill="#E5484D" stroke="none"/><circle cx="14" cy="9.5" r=".8" fill="#E5484D" stroke="none"/></svg></i>ANA Atlas</div>
+   <nav class="tabs" role="tablist" id="tabs"></nav>
+  </header>
+  <h1 class="title"><span>Positive ANA</span><span>Decision Tool</span></h1>
+
+  <!-- CALCULATOR -->
+  <main id="view-calc" class="mt-3 grid gap-3 lg:grid-cols-[minmax(270px,330px)_1fr_minmax(270px,330px)] xl:grid-cols-[286px_minmax(0,1fr)_286px]">
+   <div class="order-2 lg:order-1 grid gap-3 content-start" id="colL"></div>
+   <div class="order-1 lg:order-2 hero-wrap">
+    <div class="center-grid">
+     <div class="hero" id="hero" data-mode="body">
+      <div class="body-only" id="bodyBox"><canvas id="bc" aria-label="3D anatomy: tap a marker to add a finding"></canvas><div id="hs"></div><div class="hero-note body" id="bodyNote">Loading anatomy…</div></div>
+     </div>
+     <section class="card scope-card" aria-label="Microscope: ANA pattern viewer">
+      <div class="card-h"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/></svg></span><h3>Microscope: ANA pattern</h3><span class="ml-auto pill b"><i></i>HEp-2 cells</span></div>
+      <div class="scope-body">
+       <div class="hero" id="scope" data-mode="scope">
+        <div class="disc" id="disc"><canvas id="cv" aria-label="Simulated HEp-2 immunofluorescence field"></canvas><div class="hero-note" id="heroNote" hidden></div></div>
+        <div class="zoom">
+         <button class="ibtn" id="zIn" aria-label="Zoom in"></button>
+         <button class="ibtn" id="zOut" aria-label="Zoom out"></button>
+        </div>
+       </div>
+       <div class="scope-desc" id="scopeDesc" aria-live="polite"></div>
+      </div>
+      <svg class="dial" id="dial" viewBox="0 0 600 150" role="slider" tabindex="0" aria-label="ICAP pattern selector"></svg>
+      <div class="pinfo" id="pinfo"></div>
+     </section>
+    </div>
+   </div>
+   <div class="order-3 grid gap-3 content-start" id="colR"></div>
+  </main>
+
+  <!-- CHALLENGE -->
+  <main id="view-chal" hidden class="mt-4 grid gap-3 lg:grid-cols-[minmax(240px,300px)_1fr_minmax(260px,340px)]"></main>
+  <!-- EDUCATION -->
+  <main id="view-edu" hidden class="mt-2"></main>
+  <!-- ABOUT -->
+  <main id="view-about" hidden class="mt-4"></main>
+  <!-- MODEL & LIMITS -->
+  <main id="view-evid" hidden class="mt-4"></main>
+  <dialog id="lb"><button class="ibtn" id="lbX" aria-label="Close image">×</button><img id="lbImg" alt=""><div class="cr" id="lbCap"></div></dialog>
+
+  <p class="foot">Supports, and does not replace, clinical judgement. Classification criteria are not diagnostic criteria. Pre-test weights, pattern likelihood ratios, confounder factors and tier cut-points are design assumptions (grade D) that need local calibration and rheumatology review before clinical use. Percentages are illustrative ranges, not personalized risk. The microscope view is a procedural illustration, not a patient image. 3D anatomy derived from <a href="https://dbarchive.biosciencedbc.jp/en/bodyparts3d/download.html" target="_blank" rel="noopener" style="text-decoration:underline">BodyParts3D</a>, © The Database Center for Life Science, CC BY-SA 2.1 Japan (simplified; shared under the same licence). <button class="link" id="replayTour">Replay the tutorial</button></p>
+ </div>
+</div>
+
+<dialog id="tour" aria-labelledby="tourT"></dialog>
+<div id="mbar" hidden><div class="mb-l"><span id="mbPill"></span><span class="meta" id="mbTxt"></span></div><button class="mb-go" id="mbGo" aria-label="Jump to next steps"></button></div>
+<script>
+const CFG = {"version":"2.0.0-draft","status":"Design-assumption values are marked grade D. Do not deploy clinically before local calibration.","engineParameters":{"beta0LogOdds":-4.1846,"beta1SlopePerPoint":0.48,"patternShrinkageAlpha":0.65,"combinedLrCap":26,"confounderFloor":0.3,"confounderAppliesBelowScore":8,"familyHistoryPretestOddsMultiplier":1.5,"thresholds":{"greenMaxPost":0.05,"yellowMaxPost":0.35,"expeditedMinPost":0.75,"redScore":8},"lowPretestMaxScore":3,"titerSoftReflexFrom":"titer_1_320"},"assayMethods":[{"id":"hep2_iif","label":"HEp-2 IIF (reference method)","useTiterBands":true},{"id":"solid_phase","label":"ELISA / multiplex / CBA","useTiterBands":false,"note":"No titer. Use assayCombos. Replace with manufacturer cutoff."}],"assayCombos":[{"id":"iif_pos_only","lr":5.1,"source":"Bossuyt 2020","grade":"B"},{"id":"sp_pos_only","lr":14.4,"source":"Bossuyt 2020","grade":"B"},{"id":"both_pos","lr":26.2,"source":"Bossuyt 2020","grade":"B"},{"id":"both_neg","lr":0.15,"source":"Bossuyt 2020","grade":"B"}],"clinicalDomains":[{"id":"constitutional","rule":"MAX","items":[{"id":"fever","label":"Unexplained fever >38.3C (after infection work-up)","weight":2,"src":"SLE 2019","grade":"A"}]},{"id":"msk","rule":"MAX","items":[{"id":"synovitis","label":"Synovitis >=2 joints, or tenderness >=2 joints + >=30 min stiffness","weight":6,"src":"SLE 2019","grade":"A"},{"id":"proximal_weakness","label":"Objective proximal weakness with raised CK","weight":6,"src":"IIM 2017 (rescaled)","grade":"D"}]},{"id":"lupus_skin","rule":"MAX","items":[{"id":"acute_cutaneous_lupus","label":"Malar (spares nasolabial folds) or generalised photosensitive rash","weight":6,"src":"SLE 2019","grade":"A"},{"id":"scle_discoid","label":"Subacute cutaneous or discoid lupus","weight":4,"src":"SLE 2019","grade":"A"},{"id":"oral_ulcer_alopecia","label":"Painless oral ulcers or non-scarring alopecia","weight":2,"src":"SLE 2019","grade":"A"}]},{"id":"myositis_skin","rule":"MAX","items":[{"id":"gottron_heliotrope","label":"Gottron papules/sign or heliotrope rash","weight":6,"src":"IIM 2017 (rescaled)","grade":"D"},{"id":"mechanics_hands","label":"Mechanic's hands (cracked, scaly skin along the fingers)","weight":4,"src":"Antisynthetase syndrome (design: not scored in 2017 IIM criteria)","grade":"D"}]},{"id":"sclerosis_skin","rule":"MAX","items":[{"id":"skin_thickening_proximal_mcp","label":"Skin thickening proximal to MCPs","weight":9,"src":"SSc 2013 (sufficient alone)","grade":"A"},{"id":"sclerodactyly","label":"Sclerodactyly (fingers distal to MCPs)","weight":4,"src":"SSc 2013","grade":"A"},{"id":"puffy_fingers","label":"Puffy fingers (diffuse swelling of the fingers)","weight":2,"src":"SSc 2013","grade":"A"}]},{"id":"vascular","rule":"MAX","items":[{"id":"digital_ulcer","label":"Digital ulcer / pitting scars / gangrene","weight":5,"src":"SSc 2013 (rescaled)","grade":"D"},{"id":"raynaud","label":"Biphasic/triphasic Raynaud","weight":4,"src":"SSc 2013 =3; set 4 to hit 10% anchor","grade":"D"},{"id":"telangiectasia","label":"Telangiectasia (face, hands, lips)","weight":2,"src":"SSc 2013","grade":"A"}]},{"id":"sicca","rule":"MAX","items":[{"id":"objective_sicca","label":"Objective sicca (Schirmer<=5, OSS>=5, UWS<=0.1) or parotid swelling","weight":4,"src":"Sjogren 2016 (rescaled)","grade":"D"}]},{"id":"renal","rule":"MAX","items":[{"id":"nephritis_class_3_4","label":"Biopsy class III/IV lupus nephritis","weight":10,"src":"SLE 2019","grade":"A"},{"id":"nephritis_class_2_5","label":"Biopsy class II/V lupus nephritis","weight":8,"src":"SLE 2019","grade":"A"},{"id":"proteinuria","label":"Proteinuria >0.5 g/24h (UPCR >0.5) or active sediment","weight":4,"src":"SLE 2019 (sediment: design)","grade":"A/D"}]},{"id":"serosal","rule":"MAX","items":[{"id":"pericarditis","label":"Acute pericarditis","weight":6,"src":"SLE 2019","grade":"A"},{"id":"effusion","label":"Pleural or pericardial effusion","weight":5,"src":"SLE 2019","grade":"A"}]},{"id":"pulmonary","rule":"MAX","items":[{"id":"ild_pah","label":"Unexplained ILD (NSIP/UIP) or PAH","weight":4,"src":"SSc 2013 =2; moderate tier","grade":"D"}]},{"id":"neuropsych","rule":"MAX","items":[{"id":"seizure","label":"Seizure","weight":5,"src":"SLE 2019","grade":"A"},{"id":"psychosis","label":"Psychosis","weight":3,"src":"SLE 2019","grade":"A"},{"id":"delirium","label":"Delirium","weight":2,"src":"SLE 2019","grade":"A"}]},{"id":"hematologic","rule":"MAX","items":[{"id":"hemolysis","label":"Autoimmune hemolysis","weight":4,"src":"SLE 2019","grade":"A"},{"id":"thrombocytopenia","label":"Platelets <100,000 (no other cause)","weight":4,"src":"SLE 2019","grade":"A"},{"id":"leukopenia","label":"WBC <4,000 (no other cause)","weight":3,"src":"SLE 2019","grade":"A"}]},{"id":"aps_clinical","rule":"MAX","items":[{"id":"thrombosis_pregnancy_loss","label":"Unprovoked thrombosis or recurrent pregnancy loss","weight":3,"src":"Repo moderate tier","grade":"D"}]},{"id":"penalty","rule":"PENALTY_IF_NO_OBJECTIVE","items":[{"id":"nonspecific_only","label":"Fatigue / diffuse pain / fibromyalgia / brain fog ONLY","weight":-2,"src":"Arora 2017; Kotter 2007","grade":"C"}]}],"redFlags":["new_proteinuria_or_active_sediment_or_rising_creatinine","significant_cytopenia_esp_with_fever","pleuritic_pericardial_pain_or_effusion","seizure_psychosis_delirium_focal_deficit","digital_ischemia_ulcer_gangrene","rapid_proximal_weakness_dysphagia_dyspnea","new_dyspnea_or_crackles_with_raynaud_or_rash","fever_or_weight_loss_with_strong_ctd_suspicion","thrombosis_or_pregnancy_morbidity"],"titerSpectrum":[{"id":"titer_neg","std":"<1:40","legacy32":"<1:32","healthyBand":0.683,"healthyCumulative":0,"lr":0.05,"lrRange":[0.03,0.08],"grade":"B"},{"id":"titer_1_40","std":"1:40","legacy32":"1:32","healthyBand":0.184,"healthyCumulative":0.317,"lr":0.7,"lrRange":[0.3,1],"grade":"D"},{"id":"titer_1_80","std":"1:80","legacy32":"1:64","healthyBand":0.083,"healthyCumulative":0.133,"lr":0.5,"lrRange":[0.25,0.8],"grade":"C"},{"id":"titer_1_160","std":"1:160","legacy32":"1:128","healthyBand":0.017,"healthyCumulative":0.05,"lr":2,"lrRange":[1,6],"grade":"D"},{"id":"titer_1_320","std":"1:320","legacy32":"1:256","healthyBand":0.013,"healthyCumulative":0.033,"lr":10,"lrRange":[6,26],"grade":"C"},{"id":"titer_1_640","std":"1:640","legacy32":"1:512","healthyBand":0.01,"healthyCumulative":0.02,"lr":19,"lrRange":[10,26],"grade":"C"},{"id":"titer_1_1280","std":">=1:1280","legacy32":">=1:1024","healthyBand":0.01,"healthyCumulative":0.01,"lr":20,"lrRange":[12,26],"grade":"C"}],"icapPatterns":[{"id":"AC-1","name":"Homogeneous","lr":1.5,"grade":"D","order":["anti-dsDNA","C3/C4","UA+UPCR","anti-histone if culprit drug"],"avoid":["anti-centromere"]},{"id":"AC-2","name":"Dense fine speckled (DFS70)","lr":0.18,"lrRange":[0.05,0.5],"grade":"C","conditional":"adult AND anti-DFS70 monospecific confirmed AND no specific Ab AND no objective feature; else use lrUnconfirmed","lrUnconfirmed":0.5,"bypassShrinkage":true,"order":["anti-DFS70 (if not done)","limited ENA to exclude co-antibodies"],"avoid":["broad ENA panel"]},{"id":"AC-3","name":"Centromere","lr":22,"grade":"C","softReflex":true,"order":["Raynaud/puffy-finger/capillaroscopy screen","ALP + AMA","echo/PFT with DLCO if SSc features"],"avoid":["broad ENA panel"],"caveat":"In anti-CENP+ cohort PBC 23.8% and Sjogren 22.5% outnumbered SSc 6.2% (Li 2026)."},{"id":"AC-4","name":"Fine speckled","lr":1.5,"grade":"D","order":["anti-SSA/Ro60/52","anti-SSB/La"],"addIf":{"weakness_or_rash":["myositis panel","CK"]}},{"id":"AC-4a","name":"Myriad discrete fine speckled (Ro60)","lr":null,"grade":"D","order":["anti-SSA/Ro60"],"note":"Reflex only; no probability change."},{"id":"AC-5","name":"Large/coarse speckled","lr":4.2,"grade":"D","softReflex":true,"order":["anti-Sm","anti-U1-RNP","anti-RNA Pol III if skin/Raynaud","C3/C4"]},{"id":"AC-6_7","name":"Nuclear dots (multiple/few)","lr":null,"grade":"D","order":["AMA","ALP","anti-Sp100"],"note":"Organ-specific (PBC), reflex only."},{"id":"AC-8_9_10","name":"Nucleolar (homogeneous/clumpy/punctate)","lr":4.2,"grade":"D","softReflex":true,"order":["SSc panel (Scl-70, RNA Pol III, PM/Scl, Th/To, fibrillarin)","HRCT + PFT if Raynaud/dyspnea"],"avoid":["anti-histone"],"caveat":"Often high titer without disease; specific antibody carries the association."},{"id":"AC-12","name":"Punctate nuclear envelope","lr":null,"grade":"D","order":["AMA","anti-gp210"]},{"id":"AC-13","name":"PCNA-like","lr":null,"grade":"D","order":["anti-PCNA if available","anti-dsDNA"]},{"id":"AC-14","name":"CENP-F-like","lr":null,"grade":"D","order":["age-appropriate cancer evaluation"],"note":"Low SARD yield."},{"id":"AC-15","name":"Cytoplasmic fibrillar linear (actin)","lr":null,"grade":"D","order":["anti-smooth muscle Ab","LFTs"]},{"id":"AC-19_20","name":"Cytoplasmic speckled (AC-19 dense fine, AC-20 fine)","lr":4.5,"grade":"D","softReflex":true,"order":["Jo-1 + antisynthetase panel (PL-7, PL-12)","ribosomal P","CK","chest imaging/PFT"],"avoid":["nuclear-only ENA"],"caveat":"Can be reported with a nuclear-negative screen."},{"id":"AC-21","name":"Reticular / AMA","lr":null,"grade":"B","softReflex":true,"order":["AMA-M2","ALP"]},{"id":"AC-22_23","name":"Golgi / rods and rings","lr":null,"grade":"D","order":[],"note":"Low yield; ask about HCV therapy (rods/rings)."},{"id":"AC-24_28","name":"Mitotic (centrosome, spindle, NuMA, bridge, chromosomal)","lr":null,"grade":"D","order":[],"note":"Mostly non-specific."},{"id":"AC-29","name":"Topoisomerase I-like","lr":10,"grade":"D","softReflex":true,"order":["anti-Scl-70","HRCT + PFT"],"note":"96.2% of SSc with AC-29 are anti-Scl-70+ (Ouyang 2026)."},{"id":"UNSPEC","name":"Pattern not reported / 'speckled' only","lr":1,"grade":"-","order":["ask lab for ICAP code"],"note":"Do not guess AC-2 vs AC-4 vs AC-5."}],"confounders":[{"id":"chronic_infection","label":"Active/chronic infection (HCV, EBV, SBE)","cf":0.45,"grade":"D"},{"id":"culprit_drug","label":"Culprit drug (hydralazine, procainamide, minocycline, anti-TNF, ICI)","cf":0.5,"grade":"D","route":"drug-induced lupus branch"},{"id":"autoimmune_thyroid","label":"Hashimoto / Graves","cf":0.55,"grade":"D"},{"id":"age_over_65","label":"Age >65","cf":0.7,"grade":"C"},{"id":"first_degree_relative","label":"First-degree relative with AARD","cf":0.75,"grade":"D","also":"raises pretest odds (familyHistoryPretestOddsMultiplier)"}],"specificAntibodiesForcingReferral":["anti-dsDNA","anti-Sm","anti-Scl-70","anti-RNA-PolIII","anti-Jo-1","anti-U1-RNP","anti-centromere+Raynaud"]};
+const CASES = [{"id":"c01","vignette":"34-year-old woman with six months of fatigue and diffuse aches. She has Hashimoto's thyroiditis; joints, skin and urine are normal on exam. The ANA was sent as a 'screen'.","input":{"symptoms":["nonspecific_only"],"titerId":"titer_1_80","patternId":"AC-4","confounders":["autoimmune_thyroid"]},"expect":"GREEN","teach":"An exact 1:80 slightly lowers the odds of SLE, and thyroid disease raises background ANA. Fatigue and aches are not an indication. No ENA, no repeat ANA."},{"id":"c02","vignette":"41-year-old woman with vague joint aching but no swelling or stiffness. Exam is normal. The lab confirmed isolated anti-DFS70 antibodies.","input":{"symptoms":[],"titerId":"titer_1_320","patternId":"AC-2","dfs70Confirmed":true},"expect":"GREEN","teach":"A confirmed monospecific DFS70 pattern with no objective features is reassuring in adults, even at 1:320. It would not be reassuring in a child."},{"id":"c03","vignette":"52-year-old woman with three years of biphasic Raynaud's and puffy fingers. No dyspnea, ulcers or rash. The lab reports a centromere pattern.","input":{"symptoms":["raynaud"],"titerId":"titer_1_640","patternId":"AC-3"},"expect":"RED_ROUTINE","teach":"Raynaud plus a centromere pattern is a very-early-SSc picture. Skip the broad ENA; check ALP/AMA (PBC), echo and PFTs with DLCO, and refer."},{"id":"c04","vignette":"28-year-old woman with symmetric swelling of three joints and morning stiffness over 45 minutes. WBC is 3.1 with no other cause. ANA is homogeneous.","input":{"symptoms":["synovitis","leukopenia"],"titerId":"titer_1_160","patternId":"AC-1"},"expect":"RED_ROUTINE","teach":"Two organ systems put pre-test probability above 50% before the ANA is even read. A modest titer does not cap that risk. Send the referral with dsDNA, C3/C4 and urine already done."},{"id":"c05","vignette":"45-year-old man with fatigue only. His ANA was added to a routine panel and is very high. Exam and basic labs are normal.","input":{"symptoms":["nonspecific_only"],"titerId":"titer_1_1280","patternId":"AC-4"},"expect":"YELLOW","teach":"Even a very high titer leaves disease improbable with no features, so no referral. But the fine speckled pattern warrants a short targeted step: re-take the history, then SSA/SSB, not an 11-antibody panel."},{"id":"c06","vignette":"30-year-old woman with ankle swelling and foamy urine for two weeks. Urine protein:creatinine ratio is 1.2 with red cells in the sediment. ANA is 1:80.","input":{"symptoms":["proteinuria"],"redFlags":["new_proteinuria_or_active_sediment_or_rising_creatinine"],"titerId":"titer_1_80","patternId":"UNSPEC"},"expect":"URGENT","teach":"A red flag overrides a low titer. A new active urinary sediment needs same-day assessment and urgent rheumatology input."},{"id":"c07","vignette":"40-year-old woman with generalized aching and no objective findings. The lab reports a 'dense fine speckled-like' pattern at 1:320 but has not run an anti-DFS70 assay.","input":{"symptoms":[],"titerId":"titer_1_320","patternId":"AC-2"},"expect":"YELLOW","teach":"About half of labs mis-call DFS. Confirm monospecific anti-DFS70 before reassuring anyone; that is the one targeted order."},{"id":"c08","vignette":"Nine-year-old with intermittent knee pain after sport. Joints are normal, no rash, no eye symptoms. ANA 1:320, fine speckled.","input":{"pediatric":true,"symptoms":[],"titerId":"titer_1_320","patternId":"AC-4"},"expect":"GREEN","teach":"In a well child with a titer below 1:640 the ANA may be disregarded. ANA adds nothing for undiagnosed musculoskeletal pain in children."},{"id":"c09","vignette":"46-year-old woman with two years of dry eyes and mouth. Schirmer's test is 3 mm in five minutes; no joint, skin or urine findings. ANA is fine speckled.","input":{"symptoms":["objective_sicca"],"titerId":"titer_1_160","patternId":"AC-4"},"expect":"YELLOW","teach":"Objective sicca plus a fine speckled pattern is a Sjogren pathway: order anti-SSA/Ro and SSB/La, plus baseline CBC and urinalysis. You don't need a full ENA."}];
+const CREDITS = {"ana_main_patterns":{"file":"ana_main_patterns.png","title":"Main antinuclear antibody patterns on immunofluorescence.png","author":"Al-Mughales JA. Minor edits by Mikael Häggström, M.D.","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0","source":"https://commons.wikimedia.org/wiki/File:Main_antinuclear_antibody_patterns_on_immunofluorescence.png"},"ana_speckled_hep2":{"file":"ana_speckled_hep2.jpg","title":"SPECKLED.jpg","author":"Simon Caulton","licence":"CC BY-SA 3.0","licenceUrl":"https://creativecommons.org/licenses/by-sa/3.0","source":"https://commons.wikimedia.org/wiki/File:SPECKLED.jpg"},"ana_centromere":{"file":"ana_centromere.jpg","title":"CENTROMERE.jpg","author":"Simon Caulton","licence":"CC BY-SA 3.0","licenceUrl":"https://creativecommons.org/licenses/by-sa/3.0","source":"https://commons.wikimedia.org/wiki/File:CENTROMERE.jpg"},"ana_nucleolar":{"file":"ana_nucleolar.jpg","title":"ANA NUCLEOLAR.jpg","author":"Simon Caulton","licence":"CC BY-SA 3.0","licenceUrl":"https://creativecommons.org/licenses/by-sa/3.0","source":"https://commons.wikimedia.org/wiki/File:ANA_NUCLEOLAR.jpg"},"ana_dots_nucleolar":{"file":"ana_dots_nucleolar.jpg","title":"ANA NUCLEAR DOTS AND NUCLEOLAR.jpg","author":"Simon Caulton","licence":"CC BY-SA 3.0","licenceUrl":"https://creativecommons.org/licenses/by-sa/3.0","source":"https://commons.wikimedia.org/wiki/File:ANA_NUCLEAR_DOTS_AND_NUCLEOLAR.jpg"},"ana_homogeneous_liver":{"file":"ana_homogeneous_liver.jpg","title":"ANA HOMOGENOUS DNA ABS LIVER.jpg","author":"Simon Caulton","licence":"CC BY-SA 3.0","licenceUrl":"https://creativecommons.org/licenses/by-sa/3.0","source":"https://commons.wikimedia.org/wiki/File:ANA_HOMOGENOUS_DNA_ABS_LIVER.jpg"},"ana_speckled_liver":{"file":"ana_speckled_liver.jpg","title":"ANA SPECKLED LIVER.jpg","author":"Simon Caulton","licence":"CC BY-SA 3.0","licenceUrl":"https://creativecommons.org/licenses/by-sa/3.0","source":"https://commons.wikimedia.org/wiki/File:ANA_SPECKLED_LIVER.jpg"},"ana_negative_liver":{"file":"ana_negative_liver.jpg","title":"ANA NEGATIVE LIVER.jpg","author":"Simon Caulton","licence":"CC BY-SA 3.0","licenceUrl":"https://creativecommons.org/licenses/by-sa/3.0","source":"https://commons.wikimedia.org/wiki/File:ANA_NEGATIVE_LIVER.jpg"},"ana_dot_ama":{"file":"ana_dot_ama.jpg","title":"ANA NUCLEAR DOT AND AMA.jpg","author":"Simon Caulton","licence":"CC BY-SA 3.0","licenceUrl":"https://creativecommons.org/licenses/by-sa/3.0","source":"https://commons.wikimedia.org/wiki/File:ANA_NUCLEAR_DOT_AND_AMA.jpg"},"malar_rash":{"file":"malar_rash.jpg","title":"Butterfly rash of lupus erythematosus.jpg","author":"CNX OpenStax","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0","source":"https://commons.wikimedia.org/wiki/File:Butterfly_rash_of_lupus_erythematosus.jpg"},"scle":{"file":"scle.jpg","title":"Subacute cutaneous lupus erythematosus.jpg","author":"Successful treatment of refractory subacute cutaneous lupus erythematosus with deucravacitinib Bouché et al.","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0","source":"https://commons.wikimedia.org/wiki/File:Subacute_cutaneous_lupus_erythematosus.jpg"},"discoid":{"file":"discoid.jpg","title":"Discoid lupus erythematosus.JPG","author":"Leonard C. Sperling, M.D., COL, MC, USA, Department of Dermatology, Uniformed Services University","licence":"Public domain","licenceUrl":"","source":"https://commons.wikimedia.org/wiki/File:Discoid_lupus_erythematosus.JPG"},"raynaud":{"file":"raynaud.jpg","title":"Mains atteintes du syndrome de Raynaud en phase blanche.jpg","author":"Banane.c.l","licence":"CC0","licenceUrl":"http://creativecommons.org/publicdomain/zero/1.0/deed.en","source":"https://commons.wikimedia.org/wiki/File:Mains_atteintes_du_syndrome_de_Raynaud_en_phase_blanche.jpg"},"raynaud2":{"file":"raynaud2.jpg","title":"Raynaud's Phenomenon (front).jpg","author":"Thomas Galvin","licence":"CC BY-SA 4.0","licenceUrl":"https://creativecommons.org/licenses/by-sa/4.0","source":"https://commons.wikimedia.org/wiki/File:Raynaud%27s_Phenomenon_(front).jpg"},"ssc_finger":{"file":"ssc_finger.jpg","title":"Systemic sclerosis finger.jpg","author":"Frank Breuckmann, Thilo Gambichler, Peter Altmeyer and Alexander Kreuter","licence":"CC BY 2.0","licenceUrl":"https://creativecommons.org/licenses/by/2.0","source":"https://commons.wikimedia.org/wiki/File:Systemic_sclerosis_finger.jpg"},"ssc_fingers":{"file":"ssc_fingers.jpg","title":"Systemic sclerosis, fingers.jpg","author":"Maria Sieglinda von Nudeldorf","licence":"CC BY-SA 4.0","licenceUrl":"https://creativecommons.org/licenses/by-sa/4.0","source":"https://commons.wikimedia.org/wiki/File:Systemic_sclerosis,_fingers.jpg"},"calcinosis":{"file":"calcinosis.jpg","title":"Calcinosis of CREST syndrome.jpg","author":"Mikael Häggström, M.D.","licence":"CC0","licenceUrl":"http://creativecommons.org/publicdomain/zero/1.0/deed.en","source":"https://commons.wikimedia.org/wiki/File:Calcinosis_of_CREST_syndrome.jpg"},"gottron":{"file":"gottron.jpg","title":"Gottron papules .dermatomyocitis.jpg","author":"Mohammad2018","licence":"CC BY-SA 4.0","licenceUrl":"https://creativecommons.org/licenses/by-sa/4.0","source":"https://commons.wikimedia.org/wiki/File:Gottron_papules_.dermatomyocitis.jpg"},"dermatomyositis":{"file":"dermatomyositis.jpg","title":"Dermatomyositis.jpg","author":"Elizabeth M. Dugan, Adam M. Huber, Frederick W. Miller, Lisa G. Rider","licence":"CC BY-SA 3.0","licenceUrl":"https://creativecommons.org/licenses/by-sa/3.0","source":"https://commons.wikimedia.org/wiki/File:Dermatomyositis.jpg"},"ra_hands":{"file":"ra_hands.jpg","title":"Rheumatoid Arthritis.JPG","author":"James Heilman, MD","licence":"CC BY-SA 3.0","licenceUrl":"https://creativecommons.org/licenses/by-sa/3.0","source":"https://commons.wikimedia.org/wiki/File:Rheumatoid_Arthritis.JPG"},"knee_effusion":{"file":"knee_effusion.jpg","title":"Kneeffusion.JPG","author":"James Heilman, MD","licence":"CC BY-SA 3.0","licenceUrl":"https://creativecommons.org/licenses/by-sa/3.0","source":"https://commons.wikimedia.org/wiki/File:Kneeffusion.JPG"},"nailfold":{"file":"nailfold.png","title":"Nailfold Capillaries.png","author":"Dmitry Stavtsev, Nikita Margaryants, Mikhail Volkov","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0","source":"https://commons.wikimedia.org/wiki/File:Nailfold_Capillaries.png"},"rosacea":{"file":"rosacea.jpg","title":"Rosacea 01.jpg","author":"M. Sand, D. Sand, C. Thrandorf, V. Paech, P. Altmeyer, F. G. Bechara","licence":"CC BY 2.0","licenceUrl":"https://creativecommons.org/licenses/by/2.0","source":"https://commons.wikimedia.org/wiki/File:Rosacea_01.jpg"},"schirmer":{"file":"schirmer.jpg","title":"Schirmer test.JPG","author":"User:Milorad Dimic MD","licence":"CC BY-SA 3.0","licenceUrl":"https://creativecommons.org/licenses/by-sa/3.0","source":"https://commons.wikimedia.org/wiki/File:Schirmer_test.JPG"},"heliotrope_dark_skin":{"file":"heliotrope_dark_skin.jpg","title":"Dermatomyositis11.jpg","author":"Elizabeth M. Dugan, Adam M. Huber, Frederick W. Miller, Lisa G. Rider","licence":"CC BY-SA 3.0","licenceUrl":"https://creativecommons.org/licenses/by-sa/3.0","source":"https://commons.wikimedia.org/wiki/File:Dermatomyositis11.jpg"},"ssc_hands_bilateral":{"file":"ssc_hands_bilateral.jpg","title":"Systemic sclerosis, changes on hands are allways bilateral.jpg","author":"Maria Sieglinda von Nudeldorf","licence":"CC BY-SA 4.0","licenceUrl":"https://creativecommons.org/licenses/by-sa/4.0","source":"https://commons.wikimedia.org/wiki/File:Systemic_sclerosis,_changes_on_hands_are_allways_bilateral.jpg"},"urine_wbc_cast":{"file":"urine_wbc_cast.jpg","title":"WBC cast in urine.jpg","author":"Ajay Kumar Chaurasiya","licence":"CC BY-SA 4.0","licenceUrl":"https://creativecommons.org/licenses/by-sa/4.0","source":"https://commons.wikimedia.org/wiki/File:WBC_cast_in_urine.jpg"},"urine_epithelial_cast":{"file":"urine_epithelial_cast.jpg","title":"Epithelial cell cast.jpg","author":"Ajay Kumar Chaurasiya","licence":"CC BY-SA 4.0","licenceUrl":"https://creativecommons.org/licenses/by-sa/4.0","source":"https://commons.wikimedia.org/wiki/File:Epithelial_cell_cast.jpg"},"power_doppler_synovitis":{"file":"power_doppler_synovitis.jpg","title":"Wang et al. 2022, Figure 1","author":"Wang J, Wang M, Qi Q, Wu Z, Wen J","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0/","source":"https://doi.org/10.1038/s41598-022-25958-w","sourceLabel":"Scientific Reports 2022"},"dm_heliotrope_holster_gottron":{"file":"dm_heliotrope_holster_gottron.jpg","title":"dm_heliotrope_holster_gottron","author":"Chapagain M, Adhikari P, Pudasaini N, Poudel S, Timilsina B","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0/","source":"https://doi.org/10.1002/ccr3.73605","sourceLabel":"Clin Case Rep 2026"},"dm_tif1g":{"file":"dm_tif1g.jpg","title":"dm_tif1g","author":"Demir Y, Ogun H, Sulu B, Oba MC, Seyahi E","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0/","source":"https://doi.org/10.1016/j.abd.2026.501443","sourceLabel":"An Bras Dermatol 2026"},"antisynthetase_heliotrope_mechanics":{"file":"antisynthetase_heliotrope_mechanics.jpg","title":"antisynthetase_heliotrope_mechanics","author":"Arrazola-Mendoza KS, González-Chávez HE, De la Peña-Camacho F, Reyes-Ferreira E, Gomez-Alvarez U","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0/","source":"https://doi.org/10.7759/cureus.93503","sourceLabel":"Cureus 2025"},"mechanics_hands_dark_skin":{"file":"mechanics_hands_dark_skin.jpg","title":"mechanics_hands_dark_skin","author":"Iba Ba J, Mfoumou A, Nseng-Nseng Ondo I, Kombila UD, Boguikouma JB","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0/","source":"https://doi.org/10.48327/mtsi.v5i2.2025.711","sourceLabel":"Méd Trop Santé Int 2025"},"dle_scalp_dark_skin":{"file":"dle_scalp_dark_skin.jpg","title":"dle_scalp_dark_skin","author":"Alchorne MMA, Conceição KDC, Barraza LL, Milanez Morgado de Abreu MA","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0/","source":"https://doi.org/10.1016/j.abd.2023.10.001","sourceLabel":"An Bras Dermatol 2024"},"lupus_oral_palate":{"file":"lupus_oral_palate.jpg","title":"lupus_oral_palate","author":"Saeed Z, Khan S, Golani S, Shah N, Hassan M","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0/","source":"https://doi.org/10.7759/cureus.106346","sourceLabel":"Cureus 2026"},"ssc_face_telangiectasia":{"file":"ssc_face_telangiectasia.jpg","title":"ssc_face_telangiectasia","author":"Tamura Y, Isobe S, Fujii H, Shirai Y, Kuwana M","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0/","source":"https://doi.org/10.3389/fcvm.2026.1956123","sourceLabel":"Front Cardiovasc Med 2026"},"ssc_face_hands":{"file":"ssc_face_hands.jpg","title":"ssc_face_hands","author":"Li J, Zhang J, Li SG, Zhang L, Zou Y, Long T, Yu R, Zhang Y","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0/","source":"https://doi.org/10.3389/fmed.2026.1882228","sourceLabel":"Front Med 2026"},"hep2_ac1_ac2":{"file":"hep2_ac1_ac2.jpg","title":"hep2_ac1_ac2","author":"Santos WFS, Cantuária APC, Félix DC, Guimarães NC, de Melo ICS, et al.","licence":"CC BY","licenceUrl":"https://creativecommons.org/licenses/by/4.0/","source":"https://doi.org/10.3389/fimmu.2023.1256526","sourceLabel":"Front Immunol 2023"},"hep2_ac4a_ac4b":{"file":"hep2_ac4a_ac4b.jpg","title":"hep2_ac4a_ac4b","author":"Santos WFS, Cantuária APC, Félix DC, Guimarães NC, de Melo ICS, et al.","licence":"CC BY","licenceUrl":"https://creativecommons.org/licenses/by/4.0/","source":"https://doi.org/10.3389/fimmu.2023.1256526","sourceLabel":"Front Immunol 2023"},"hep2_homog_speckled_ac19":{"file":"hep2_homog_speckled_ac19.jpg","title":"hep2_homog_speckled_ac19","author":"Tseng YW, Lin CL, Chen SY, Er TK","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0/","source":"https://doi.org/10.3389/bjbs.2025.15625","sourceLabel":"Br J Biomed Sci 2025"},"hep2_pbc_patterns":{"file":"hep2_pbc_patterns.jpg","title":"hep2_pbc_patterns","author":"Antal-Szalmás P, Bencze D, Demeter S, Pénzes-Daku K, Szabó L, Tóth B, et al.","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0/","source":"https://doi.org/10.1016/j.jtauto.2026.100366","sourceLabel":"J Transl Autoimmun 2026"},"hep2_rods_rings":{"file":"hep2_rods_rings.jpg","title":"hep2_rods_rings","author":"Wang P, Wu S, Liu J, Pei J, Zhang C, Chen X, et al.","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0/","source":"https://doi.org/10.3389/fimmu.2026.1831506","sourceLabel":"Front Immunol 2026"},"hep2_dfs_vs_pseudo":{"file":"hep2_dfs_vs_pseudo.jpg","title":"hep2_dfs_vs_pseudo","author":"Sanchez-Hernandez ES, Ortiz-Hernandez GL, Ochoa PT, Reeves M, Bizzaro N, Andrade LEC, Mahler M, Casiano CA","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0/","source":"https://doi.org/10.3390/diagnostics13020222","sourceLabel":"Diagnostics 2023"},"urine_active_sediment":{"file":"urine_active_sediment.jpg","title":"urine_active_sediment","author":"Suyambulingam A, K A, Jayakaran V, Venkatesan A, Mathisha EP","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0/","source":"https://doi.org/10.7759/cureus.89817","sourceLabel":"Cureus 2025"},"urine_dysmorphic_rbc":{"file":"urine_dysmorphic_rbc.jpg","title":"urine_dysmorphic_rbc","author":"Pons-Belda OD, Ferri MJ, Almería-Lafuente A, Izquierdo-Álvarez C, et al.","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0/","source":"https://doi.org/10.1515/almed-2026-0048","sourceLabel":"Adv Lab Med 2026"},"hep2_ac19_20_anti_oj":{"file":"hep2_ac19_20_anti_oj.jpg","title":"hep2_ac19_20_anti_oj","author":"Fritzler MJ, Bentow C, Satoh M, McHugh N, Ghirardello A, Mahler M","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0/","source":"https://doi.org/10.3390/diagnostics13010156","sourceLabel":"Diagnostics 2023"},"lupus_palatal_ulcers":{"file":"lupus_palatal_ulcers.jpg","title":"lupus_palatal_ulcers","author":"Uva L, Miguel D, Pinheiro C, Freitas JP, Marques Gomes M, Filipe P, et al.","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0/","source":"https://doi.org/10.1155/2012/834291","sourceLabel":"Autoimmune Dis 2012"},"ssc_puffy_hands":{"file":"ssc_puffy_hands.jpg","title":"ssc_puffy_hands","author":"Freixo A, Abreu C","licence":"CC BY 4.0","licenceUrl":"https://creativecommons.org/licenses/by/4.0/","source":"https://doi.org/10.7759/cureus.32291","sourceLabel":"Cureus 2022"}};
+// Pure engine, no imports: build.mjs inlines this file into index.html.
+const odds = (p) => p / (1 - p);
+const prob = (o) => o / (1 + o);
+
+function calc(inp, c) {
+  const P = c.engineParameters;
+  const ids = new Set(inp.symptoms ?? []);
+  let score = 0, objective = false, penalty = 0;
+  for (const d of c.clinicalDomains) {
+    const w = d.items.filter((i) => ids.has(i.id)).map((i) => i.weight);
+    if (!w.length) continue;
+    if (d.rule === "MAX") { const m = Math.max(...w); score += m; if (m > 0) objective = true; }
+    else penalty += Math.min(...w);
+  }
+  if (!objective) score += penalty;
+
+  if (inp.redFlags?.length) return { score, tier: "URGENT" };
+  if (inp.pediatric) { // evidence is single-centre: rules only, no numbers
+    const hi = inp.titerId === "titer_1_640" || inp.titerId === "titer_1_1280";
+    return { score, tier: objective || hi ? "RED_ROUTINE" : "GREEN", numeric: false };
+  }
+
+  let o = Math.exp(P.beta0LogOdds + P.beta1SlopePerPoint * score);
+  if (inp.confounders?.includes("first_degree_relative")) o *= P.familyHistoryPretestOddsMultiplier;
+  const pre = prob(o);
+
+  const combo = inp.assayComboId ? c.assayCombos.find((x) => x.id === inp.assayComboId) : null;
+  const t = combo ? null : c.titerSpectrum.find((x) => x.id === inp.titerId);
+  const pat = combo ? c.icapPatterns.at(-1) : c.icapPatterns.find((x) => x.id === inp.patternId) ?? c.icapPatterns.at(-1);
+  let lrT = combo ? combo.lr : inp.lrBound ? t.lrRange[inp.lrBound === "lo" ? 0 : 1] : t.lr;
+  let lrP = pat.lr ?? 1;
+  if (pat.id === "AC-2") lrP = inp.dfs70Confirmed && !objective && !inp.specificAb ? pat.lr : pat.lrUnconfirmed;
+  if (lrP >= 1 && lrT >= 1 && !pat.bypassShrinkage) lrP = lrP ** P.patternShrinkageAlpha;
+
+  // dampen only LRs >=1: multiplying an LR <1 would add false reassurance
+  const cfs = c.confounders.filter((x) => inp.confounders?.includes(x.id)).map((x) => x.cf);
+  const cf = cfs.length && score < P.confounderAppliesBelowScore && lrT >= 1 ? Math.max(P.confounderFloor, Math.min(...cfs)) : 1;
+
+  const lr = Math.min(P.combinedLrCap, lrT * cf * lrP);
+  const post = prob(odds(pre) * lr);
+
+  const th = P.thresholds;
+  let tier;
+  if (inp.specificAb || (inp.abnormalLabs && post > th.yellowMaxPost)) tier = "RED_EXPEDITED";
+  else if (post > th.expeditedMinPost) tier = "RED_EXPEDITED";
+  else if (post > th.yellowMaxPost || score >= th.redScore) tier = "RED_ROUTINE";
+  else if (post > th.greenMaxPost) tier = "YELLOW";
+  else tier = "GREEN";
+  const soft = combo ? combo.lr >= 10
+    : c.titerSpectrum.findIndex((x) => x.id === inp.titerId) >= c.titerSpectrum.findIndex((x) => x.id === P.titerSoftReflexFrom);
+  const dfsRuledOut = pat.id === "AC-2" && lrP === pat.lr; // confirmed monospecific DFS70
+  if (tier === "GREEN" && !dfsRuledOut && (soft || pat.softReflex)) tier = "YELLOW";
+  if (tier === "GREEN" && score > P.lowPretestMaxScore) tier = "YELLOW"; // objective features: never auto-reassure
+  return { score, pre, lrT, cf, lrP, lr, post, tier, numeric: true, objective };
+}
+
+</script>
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const IC = {
+  search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  bell:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+  chev:'<path d="m6 9 6 6 6-6"/>',
+  plus:'<path d="M5 12h14"/><path d="M12 5v14"/>', minus:'<path d="M5 12h14"/>',
+  locate:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
+  reset:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>',
+  arrow:'<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+  act:'<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+  scan:'<path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/>',
+  flask:'<path d="M10 2v7.5L4.5 19a1.5 1.5 0 0 0 1.3 2.2h12.4a1.5 1.5 0 0 0 1.3-2.2L14 9.5V2"/><path d="M8.5 2h7"/>',
+  shield:'<path d="M20 13c0 5-3.5 7.5-7.7 8.9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.6 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/>',
+  list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+  target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  book:'<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>',
+  dots:'<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
+  copy:'<rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+  user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  layers:'<path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/>',
+  gauge:'<path d="m12 14 4-4"/><path d="M3.3 19a10 10 0 1 1 17.4 0"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>',
+  image:'<rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/>'
+};
+const ic = (n) => `<svg viewBox="0 0 24 24" aria-hidden="true">${IC[n]}</svg>`;
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const pct = (p, d = 1) => (p > .99 ? '>99%' : p < .001 ? '<0.1%' : (p * 100 < 10 ? (p * 100).toFixed(d) : Math.round(p * 100)) + '%');
+const rng = (a, b) => (pct(a) === pct(b) ? pct(a) : pct(a) + '–' + pct(b));
+/* odds/prob come from the inlined engine */
+
+/* ---------- state ---------- */
+const S = { tab: 'calc', view: 'body', yaw: 0, layers: { skin: true, muscles: true, skeleton: true, organs: true }, method: 'iif', legacy: false, titer: 2, combo: 'both_pos', pattern: 'UNSPEC',
+  sym: new Set(), red: new Set(), conf: new Set(), dfs: false, peds: false, ab: false, labs: false, preg: false, ro: false, zoom: 1 };
+const inp = (x = {}) => ({ symptoms: [...S.sym], redFlags: [...S.red], confounders: [...S.conf], titerId: CFG.titerSpectrum[S.titer].id,
+  patternId: S.method === 'iif' ? S.pattern : 'UNSPEC', assayComboId: S.method === 'sp' ? S.combo : undefined,
+  dfs70Confirmed: S.dfs, pediatric: S.peds, specificAb: S.ab, abnormalLabs: S.labs, ...x });
+
+/* ---------- labels ---------- */
+const SHORT = { fever:'Unexplained fever >38.3 °C', synovitis:'Swollen joints (≥2) or stiffness ≥30 min', proximal_weakness:'Proximal weakness + high CK',
+  acute_cutaneous_lupus:'Malar / photosensitive rash', scle_discoid:'Subacute or discoid lupus rash', oral_ulcer_alopecia:'Painless oral ulcers / alopecia',
+  gottron_heliotrope:'Gottron papules / heliotrope', skin_thickening_proximal_mcp:'Skin thickening above the knuckles', sclerodactyly:'Sclerodactyly (fingers)',
+  digital_ulcer:'Digital ulcer / pitting scars', raynaud:'Biphasic Raynaud', objective_sicca:'Objective dry eyes / mouth',
+  nephritis_class_3_4:'Biopsy: lupus nephritis III/IV', nephritis_class_2_5:'Biopsy: lupus nephritis II/V', proteinuria:'Proteinuria >0.5 g/day or active sediment',
+  pericarditis:'Acute pericarditis', effusion:'Pleural / pericardial effusion', ild_pah:'Unexplained ILD or PAH', seizure:'Seizure', psychosis:'Psychosis', delirium:'Delirium',
+  hemolysis:'Autoimmune hemolysis', thrombocytopenia:'Platelets <100k', leukopenia:'WBC <4,000', thrombosis_pregnancy_loss:'Thrombosis / recurrent pregnancy loss',
+  nonspecific_only:'Fatigue / diffuse pain / brain fog only', puffy_fingers:'Puffy fingers', telangiectasia:'Telangiectasia', mechanics_hands:'Mechanic’s hands' };
+const DOM = { constitutional:'General', msk:'Muscle and joint', lupus_skin:'Lupus skin and mucosa', myositis_skin:'Dermatomyositis skin', sclerosis_skin:'Scleroderma skin',
+  vascular:'Vascular', sicca:'Glands', renal:'Kidney', serosal:'Heart and pleura', pulmonary:'Lung', neuropsych:'Nervous system', hematologic:'Blood', aps_clinical:'Clotting', penalty:'Non-specific' };
+const RED = { new_proteinuria_or_active_sediment_or_rising_creatinine:'New proteinuria, active sediment or rising creatinine', significant_cytopenia_esp_with_fever:'Significant cytopenia, esp. with fever',
+  pleuritic_pericardial_pain_or_effusion:'Pleuritic / pericardial pain or effusion', seizure_psychosis_delirium_focal_deficit:'Seizure, psychosis, delirium, focal deficit',
+  digital_ischemia_ulcer_gangrene:'Digital ischemia, ulcer or gangrene', rapid_proximal_weakness_dysphagia_dyspnea:'Rapid weakness, dysphagia or dyspnea',
+  new_dyspnea_or_crackles_with_raynaud_or_rash:'New dyspnea / crackles with Raynaud or rash', fever_or_weight_loss_with_strong_ctd_suspicion:'Fever or >5% weight loss, strong CTD suspicion',
+  thrombosis_or_pregnancy_morbidity:'Thrombosis or pregnancy morbidity' };
+const CONF = { chronic_infection:'Chronic infection (HCV, EBV)', culprit_drug:'Culprit drug', autoimmune_thyroid:'Thyroid autoimmunity', age_over_65:'Age over 65', first_degree_relative:'Relative with AARD' };
+const COMBO = { iif_pos_only:'IIF + / solid-phase −', sp_pos_only:'IIF − / solid-phase +', both_pos:'Both positive', both_neg:'Both negative' };
+const TIER = {
+  GREEN:{ pill:'g', label:'Reassure', head:'Reassure and stop' },
+  YELLOW:{ pill:'y', label:'Targeted work-up', head:'Targeted work-up' },
+  RED_ROUTINE:{ pill:'r', label:'Refer · routine', head:'Refer to rheumatology' },
+  RED_EXPEDITED:{ pill:'r', label:'Refer · expedited', head:'Refer to rheumatology, expedited' },
+  URGENT:{ pill:'k', label:'Urgent · same day', head:'Same-day evaluation' } };
+
+/* ICAP rendering metadata: mode = how nuclei look, plate = mitotic chromatin */
+const PM = {
+ 'AC-1':{ code:'1', mode:'homog', plate:'bright', ab:'dsDNA, nucleosomes, histones', dis:'SLE, drug-induced lupus, autoimmune hepatitis', a:'Uniform, diffuse nucleus', b:'Plate stained, smooth' },
+ 'AC-2':{ code:'2', mode:'dfs', plate:'bright', ab:'DFS70 / LEDGF-p75', dis:'Mostly healthy people; rarely SARD if monospecific', a:'Dense fine speckles, uneven size', b:'Plate positive' },
+ 'AC-3':{ code:'3', mode:'dots', plate:'aligned', ab:'CENP-A, CENP-B', dis:'Limited SSc, PBC, Sjögren', a:'40–80 discrete dots', b:'Dots line up on the plate' },
+ 'AC-4':{ code:'4', mode:'fine', plate:'dark', ab:'SSA/Ro, SSB/La, Mi-2, TIF1γ', dis:'Sjögren, SLE, SCLE, dermatomyositis', a:'Fine granules, nucleoli spared', b:'Plate unstained (dark)' },
+ 'AC-4a':{ code:'4a', mode:'fine2', plate:'dark', ab:'SSA/Ro60 (~98%)', dis:'Sjögren, SLE', a:'Myriad discrete fine dots', b:'Plate unstained (dark)' },
+ 'AC-5':{ code:'5', mode:'coarse', plate:'dark', ab:'Sm, U1-RNP, RNA Pol III', dis:'SLE, MCTD, SSc', a:'Large, clumped granules', b:'Plate unstained (dark)' },
+ 'AC-6_7':{ code:'6/7', mode:'fewdots', plate:'dark', ab:'Sp100, PML, coilin', dis:'PBC, Sjögren', a:'Few to multiple bright nuclear dots', b:'Plate unstained (dark)' },
+ 'AC-8_9_10':{ code:'8–10', mode:'nucleolar', plate:'dark', ab:'Th/To, PM/Scl, fibrillarin, RNA Pol I', dis:'SSc spectrum, myositis overlap', a:'Nucleoli light up', b:'Plate unstained (dark)' },
+ 'AC-12':{ code:'12', mode:'envelope', plate:'dark', ab:'gp210', dis:'PBC', a:'Punctate rim of the nucleus', b:'Plate unstained (dark)' },
+ 'AC-13':{ code:'13', mode:'variable', plate:'dark', ab:'PCNA', dis:'SLE (rare, specific)', a:'Staining varies by cell-cycle phase', b:'Plate unstained (dark)' },
+ 'AC-14':{ code:'14', mode:'variable', plate:'spindle', ab:'CENP-F', dis:'Malignancy (low SARD yield)', a:'Variable nuclear staining', b:'Spindle and poles light up' },
+ 'AC-15':{ code:'15', mode:'fibres', plate:'dark', ab:'Actin', dis:'Autoimmune hepatitis', a:'Cytoplasmic linear fibres', b:'Plate unstained (dark)' },
+ 'AC-19_20':{ code:'19/20', mode:'cyto', plate:'dark', ab:'Jo-1, PL-7, PL-12, SRP, ribosomal P', dis:'Antisynthetase syndrome, IMNM, SLE', a:'Cytoplasm speckled; nucleus dark', b:'Cytoplasm speckled around the plate' },
+ 'AC-21':{ code:'21', mode:'reticular', plate:'dark', ab:'PDC-E2 (AMA-M2)', dis:'Primary biliary cholangitis', a:'Mitochondrial network in cytoplasm', b:'Network around the plate' },
+ 'AC-22_23':{ code:'22/23', mode:'golgi', plate:'dark', ab:'Golgins, IMPDH2', dis:'Infection, HCV therapy (low yield)', a:'Perinuclear Golgi-like crescents', b:'Plate unstained (dark)' },
+ 'AC-24_28':{ code:'24–28', mode:'spindle', plate:'spindle', ab:'Various mitotic antigens', dis:'Mostly non-specific', a:'Interphase barely stained', b:'Mitotic apparatus stained' },
+ 'AC-29':{ code:'29', mode:'topo', plate:'bright', ab:'Topoisomerase I (Scl-70)', dis:'Diffuse SSc, ILD', a:'Fine nuclear plus bright nucleoli', b:'Chromosomes stained' },
+ 'UNSPEC':{ code:'?', mode:'generic', plate:'none', ab:'Not reported', dis:'Ask the lab for the ICAP code', a:'Staining pattern not reported', b:'—' } };
+const PIDS = CFG.icapPatterns.map((p) => p.id);
+
+/* ---------- top bar ---------- */
+const TABS = [['calc', 'Calculator', 'gauge'], ['chal', 'Triage Challenge', 'target'], ['edu', 'Education', 'image'], ['evid', 'Model & limits', 'shield'], ['about', 'About the author', 'user']];
+$('#mbGo').innerHTML = ic('arrow'); $('#mbGo').onclick = () => $('#colR').scrollIntoView({ behavior: 'smooth', block: 'start' });
+function renderTabs() {
+  $('#mbar').classList.toggle('on', S.tab === 'calc'); $('#mbar').hidden = false;
+  $('#tabs').innerHTML = TABS.map(([k, l, i]) => `<button class="tab" role="tab" aria-selected="${S.tab === k}" data-tab="${k}">${ic(i)}${l}</button>`).join('');
+  ['calc', 'chal', 'edu', 'evid', 'about'].forEach((k) => ($('#view-' + k).hidden = S.tab !== k));
+}
+$('#tabs').onclick = (e) => { const b = e.target.closest('[data-tab]'); if (!b) return; S.tab = b.dataset.tab; renderTabs(); if (S.tab === 'calc') requestAnimationFrame(() => { drawHero(); place(); window.Body?.start(); }); if (S.tab === 'chal') chalRender(); if (S.tab === 'edu') eduRender(); if (S.tab === 'evid') evidRender(); if (S.tab === 'about') aboutRender(); window.scrollTo({ top: 0 }); };
+$('#zIn').innerHTML = ic('plus'); $('#zOut').innerHTML = ic('minus');
+
+/* ---------- left column ---------- */
+const chipBtn = (cls, key, id, on, text, title = '') => `<button class="chip ${cls}" aria-pressed="${on}" data-k="${key}" data-id="${id}" title="${esc(title)}">${text}</button>`;
+function assayCard() {
+  const T = CFG.titerSpectrum, cur = T[S.titer];
+  const lab = (t) => (S.legacy ? t.legacy32 : t.std);
+  let body;
+  if (S.method === 'iif') {
+    const logs = T.map((t) => Math.log10(t.lr));
+    const mn = Math.min(...logs), mx = Math.max(...logs);
+    const pts = T.map((t, i) => [8 + i * (184 / 6), 6 + (1 - (Math.log10(t.lr) - mn) / (mx - mn)) * 42]);
+    body = `<div class="tubes">${T.map((t, i) => `<button class="tube" data-k="titer" data-id="${i}" aria-pressed="${i === S.titer}" aria-label="Titer ${lab(t)}"><div class="glass"><div class="fill" style="height:${14 + i * 12}%;background:${i < 2 ? 'var(--pink-1)' : i < 4 ? 'var(--pink-2)' : 'var(--coral)'}"></div></div><small>${lab(t).replace('>=', '≥').replace('<', '<')}</small></button>`).join('')}</div>
+    ${S.legacy ? `<p class="meta t mt-2">Legacy series shown; the engine rank-maps it to the standard tier (±1 tier uncertainty).</p>` : ''}
+    <div class="well mt-3"><div class="flex justify-between items-baseline"><span class="meta">Healthy adults ≥ this titer</span><b class="font-medium text-[13px]">${cur.healthyCumulative ? pct(cur.healthyCumulative) : '—'}</b></div>
+      <div class="rail mt-1"><b style="width:${Math.min(100, cur.healthyCumulative * 100 * 2.6)}%;background:#C3CBD5"></b></div>
+      <div class="flex justify-between items-baseline mt-3"><span class="meta">Likelihood ratio for AARD</span><b class="font-medium text-[13px]">×${cur.lr} <span class="meta t">(${cur.lrRange[0]}–${cur.lrRange[1]})</span></b></div>
+      <svg class="spark mt-1" viewBox="0 0 200 54" width="100%" height="54" aria-hidden="true"><path d="M${pts.map((p) => p.join(',')).join(' L')}" fill="none" stroke="#E5484D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${pts[S.titer][0]}" cy="${pts[S.titer][1]}" r="6" fill="#fff" stroke="#E5484D" stroke-width="1.5"/><circle cx="${pts[S.titer][0]}" cy="${pts[S.titer][1]}" r="2.5" fill="#E5484D"/></svg></div>`;
+  } else {
+    body = `<p class="meta mb-2">Solid-phase assays give no titer or ICAP pattern. Choose how the two assays agree.</p><div class="flex flex-wrap gap-2">${Object.entries(COMBO).map(([k, l]) => chipBtn('', 'combo', k, S.combo === k, l)).join('')}</div>
+    <div class="well mt-3 meta">LR ×${CFG.assayCombos.find((c) => c.id === S.combo).lr} (Bossuyt 2020). Replace with the manufacturer cutoff if you only have a solid-phase result.</div>`;
+  }
+  return `<section class="card enter"><div class="card-h"><span class="ico">${ic('flask')}</span><h3>Assay and titer</h3><span class="ml-auto seg"><button data-k="method" data-id="iif" aria-pressed="${S.method === 'iif'}">IIF</button><button data-k="method" data-id="sp" aria-pressed="${S.method === 'sp'}">Solid-phase</button></span></div>
+   ${S.method === 'iif' ? `<div class="flex items-center justify-between mb-3"><span class="meta">Dilution series</span><span class="seg"><button data-k="scale" data-id="std" aria-pressed="${!S.legacy}">1:40</button><button data-k="scale" data-id="leg" aria-pressed="${S.legacy}">1:32</button></span></div>` : ''}${body}</section>`;
+}
+function safetyCard() {
+  return `<section class="card"><div class="card-h"><span class="ico">${ic('shield')}</span><h3>Safety first</h3><span class="ml-auto pill ${S.red.size ? 'r' : 'g'}"><i></i>${S.red.size ? 'Red flag' : 'None'}</span></div>
+   <p class="meta mb-2">Any red flag overrides titer and pattern.</p><div class="flex flex-wrap gap-1.5">${Object.entries(RED).map(([k, l]) => chipBtn('sm warn', 'red', k, S.red.has(k), l)).join('')}</div></section>`;
+}
+function findingsCard() {
+  const groups = CFG.clinicalDomains.map((d) => `<div class="group-l">${DOM[d.id] || d.id}</div><div class="flex flex-wrap gap-1.5">${d.items.map((i) => chipBtn('sm', 'sym', i.id, S.sym.has(i.id), SHORT[i.id] || i.label, `${i.label} · ${i.weight > 0 ? '+' : ''}${i.weight} pts · ${i.src}`)).join('')}</div>`).join('');
+  return `<section class="card"><div class="card-h"><span class="ico">${ic('act')}</span><h3>Clinical findings</h3><span class="ml-auto pill b"><i></i>${S.sym.size} selected</span></div>
+   <p class="meta mb-3">Only objective, unexplained findings. Highest item per domain counts.</p><div class="scroll" id="fscroll">${groups}</div></section>`;
+}
+function renderL() { const sc = $('#fscroll')?.scrollTop || 0; $('#colL').innerHTML = assayCard() + safetyCard() + findingsCard(); const f = $('#fscroll'); if (f) f.scrollTop = sc; }
+
+/* ---------- right column ---------- */
+const N = 40, colAt = (i) => { const t = i / (N - 1), a = [247, 198, 207], b = [229, 72, 77]; return `rgb(${a.map((v, k) => Math.round(v + (b[k] - v) * t)).join(',')})`; };
+function buildGauge() {
+  const lines = Array.from({ length: N }, (_, i) => { const a = Math.PI * (1 - i / (N - 1)), c = Math.cos(a), s = Math.sin(a);
+    return `<line style="--i:${i}" data-i="${i}" x1="${120 + 80 * c}" y1="${120 - 80 * s}" x2="${120 + 100 * c}" y2="${120 - 100 * s}" stroke="#E3E8EE"/>`; }).join('');
+  return `<div class="gauge"><svg viewBox="0 0 240 130" aria-hidden="true">${lines}</svg><div class="mid"><div class="big" id="gNum">—</div><div class="meta" id="gSub"></div></div></div>
+  <div class="legend"><span><i style="background:var(--pink-1)"></i>Low ≤5%</span><span><i style="background:var(--pink-2)"></i>Medium</span><span><i style="background:var(--coral)"></i>High &gt;35%</span><span><i style="background:var(--ink)"></i>Urgent</span></div>`;
+}
+function rightShell() {
+  $('#colR').innerHTML = `
+  <section class="card"><div class="card-h"><span class="ico">${ic('gauge')}</span><h3>Post-test probability</h3><span class="ml-auto" id="tierPill"></span></div>${buildGauge()}
+   <p class="meta t text-center mt-3" id="gNote"></p></section>
+  <div class="grid grid-cols-2 gap-3">
+   <section class="card"><div class="card-h"><span class="ico">${ic('list')}</span><h3>Pre-test</h3></div><div class="big" id="preN">—</div><div class="meta mt-1" id="preS"></div></section>
+   <section class="card"><div class="card-h"><span class="ico">${ic('layers')}</span><h3>Combined LR</h3></div><div class="big" id="lrN">—</div><div class="meta mt-1" id="lrS"></div></section>
+  </div>
+  <section class="card"><div class="card-h"><span class="ico">${ic('act')}</span><h3>How the estimate moved</h3></div><div id="shift"></div></section>
+  <section class="card"><div class="card-h"><span class="ico">${ic('user')}</span><h3>Context</h3></div><div id="ctx" class="flex flex-wrap gap-1.5"></div></section>
+  <section class="card"><div class="card-h"><span class="ico">${ic('scan')}</span><h3>Next steps</h3><span class="ml-auto kebab">${ic('dots')}</span></div><div id="steps"></div>
+   <div class="flex items-center gap-2 mt-4"><button class="cta" id="copyBtn"><span id="copyLbl">Copy referral summary</span><span class="go">${ic('arrow')}</span></button><button class="ibtn grey" id="resetBtn" aria-label="Reset all inputs">${ic('reset')}</button></div>
+   <button class="cta2 mt-2" id="pdfBtn">${ic('download')}<span id="pdfLbl">Download PDF report</span></button></section>`;
+  $('#copyBtn').onclick = copySummary; $('#pdfBtn').onclick = downloadPdf; $('#resetBtn').onclick = resetAll;
+}
+function ctxChips() {
+  const c = Object.entries(CONF).map(([k, l]) => chipBtn('sm', 'conf', k, S.conf.has(k), l));
+  const t = [['peds', 'Child (<18)', S.peds], ['ab', 'Specific antibody positive', S.ab], ['labs', 'Baseline labs abnormal', S.labs], ['preg', 'Pregnant / planning', S.preg], ['ro', 'Anti-Ro known', S.ro]].map(([k, l, on]) => chipBtn('sm', 'tog', k, on, l));
+  if (S.pattern === 'AC-2' && S.method === 'iif') t.push(chipBtn('sm', 'tog', 'dfs', S.dfs, 'Anti-DFS70 confirmed'));
+  return c.concat(t).join('');
+}
+let lastTier = null;
+function plan(r) {
+  const A = CFG.icapPatterns.find((p) => p.id === S.pattern) || {};
+  const base = ['CBC with differential', 'Creatinine / eGFR (CMP)', 'Urinalysis with microscopy + UPCR', 'C3 / C4', 'ESR / CRP'];
+  const order = [], avoid = [], notes = [];
+  const has = (...a) => a.some((x) => S.sym.has(x));
+  if (r.tier === 'URGENT') { order.push('Same-day clinical assessment or ED', 'Urgent rheumatology contact', ...base); }
+  else if (r.tier === 'GREEN') { order.push('No ENA and no repeat ANA', 'Give the symptom safety-net handout', 'Document why the ANA was ordered'); avoid.push('Broad ENA panel', 'Repeating the ANA', 'Referral for the ANA alone'); }
+  else {
+    if (r.score > 0) order.push(...base); else order.push('Re-take the history; examine joints, skin, mucosa, glands');
+    if (S.method === 'iif') order.push(...(A.order || []).filter((x) => !(r.score > 0 && /^(C3\/C4|UA\+UPCR)$/i.test(x))));
+    if (has('objective_sicca')) order.push('Anti-SSA/Ro, anti-SSB/La');
+    if (has('proximal_weakness', 'gottron_heliotrope')) order.push('CK + myositis-specific antibodies');
+    if (has('thrombosis_pregnancy_loss')) order.push('aCL, anti-β2GPI, lupus anticoagulant');
+    avoid.push(...(A.avoid || []), 'Repeating the ANA to track disease');
+    if (r.tier === 'RED_ROUTINE' || r.tier === 'RED_EXPEDITED') order.push('Send these results with the referral letter');
+    if (r.tier === 'YELLOW') notes.push('Refer if any result is abnormal. High titer or Ro/La without symptoms: CBC + urinalysis every 6–12 months for 2–5 years.');
+  }
+  if (S.conf.has('culprit_drug')) notes.push('Drug-induced lupus branch: review the culprit with the prescriber; anti-histone, dsDNA, C3/C4 (dsDNA usually negative, complement normal).');
+  if (S.preg && (S.ro || ['AC-4', 'AC-4a'].includes(S.pattern))) notes.push('Anti-Ro and pregnancy: rheumatology + maternal-fetal medicine; discuss hydroxychloroquine; fetal echo surveillance weeks 16–26.');
+  if (S.method === 'iif' && CFG.titerSpectrum[S.titer].id === 'titer_neg' && has('objective_sicca', 'proximal_weakness', 'gottron_heliotrope')) notes.push('IIF can miss Ro, Jo-1, SRP, HMGCR, MDA5: order anti-SSA and a myositis panel directly.');
+  if (S.method === 'iif' && S.pattern === 'UNSPEC') notes.push('Ask the lab for the ICAP code; do not guess AC-2 vs AC-4 vs AC-5.');
+  if (S.method === 'iif' && S.pattern === 'AC-2' && !S.dfs) notes.push('Confirm monospecific anti-DFS70 before reassuring.');
+  if (S.method === 'sp') notes.push('Solid-phase gives no pattern. If IIF is available, request titer and ICAP code.');
+  if (S.peds) notes.push('Pediatric rules only: no numeric estimate, no DFS70 rule-out. Consider uveitis screening if JIA, and JDM features (Gottron, heliotrope, weakness).');
+  const seen = new Set(); order.splice(0, order.length, ...order.filter((x) => { const k = x.toLowerCase().replace(/[^a-z0-9]/g, ''); return seen.has(k) ? false : seen.add(k); }));
+  const script = { GREEN: 'A positive ANA is common: about 1 in 7 healthy adults at this level, and more in women and older adults. With no signs of inflammation on your exam or tests, this is the “radio static” kind of result rather than a disease signal. More tests would more likely produce confusing false alarms than answers. Tell us if you develop joint swelling, a sun-sensitive rash, mouth sores, finger colour changes, persistent dry eyes or mouth, muscle weakness or foamy urine. We will not repeat the ANA.',
+    YELLOW: 'Your result is not a diagnosis. Because of one detail in your result or history, we are checking a short, specific set of tests. Most people with this result turn out fine; these tests tell us whether a specialist needs to look.',
+    RED_ROUTINE: 'I would like a specialist to look at your results. This is a precaution: your history and tests together deserve a closer look. The referral will include the tests we have already done.',
+    RED_EXPEDITED: 'I would like a specialist to see you soon. Your history and tests together deserve prompt attention, and I will send the results ahead.',
+    URGENT: '' }[r.tier];
+  return { order, avoid, notes, script };
+}
+function renderR() {
+  const r = calc(inp(), CFG), P = plan(r), T = TIER[r.tier];
+  const lo = calc(inp({ lrBound: 'lo' }), CFG), hi = calc(inp({ lrBound: 'hi' }), CFG);
+  $('#tierPill').innerHTML = `<span class="pill ${T.pill}"><i></i>${T.label}</span>`;
+  // gauge
+  const on = r.numeric ? Math.max(1, Math.round(r.post * N)) : r.tier === 'URGENT' ? N : 0;
+  document.querySelectorAll('.gauge line').forEach((l) => { const i = +l.dataset.i; l.setAttribute('stroke', i < on ? (r.tier === 'URGENT' ? '#111418' : colAt(i)) : '#E3E8EE'); });
+  $('#gNum').innerHTML = r.numeric ? `${pct(r.post)}` : r.tier === 'URGENT' ? 'Urgent' : 'Rules';
+  $('#gSub').textContent = r.numeric ? `likely range ${rng(lo.post, hi.post)}` : r.tier === 'URGENT' ? 'estimate not needed' : 'pediatric: no estimate';
+  $('#gNote').textContent = r.numeric ? 'Illustrative estimate, grade D inputs. The tier is decided by rules, not by this number alone.' : 'Red flags and child rules bypass the estimate.';
+  $('#preN').innerHTML = r.numeric ? pct(r.pre) : '—'; $('#preS').textContent = `clinical score ${r.score}`;
+  $('#lrN').innerHTML = r.numeric ? `×${r.lr < 10 ? r.lr.toFixed(1) : Math.round(r.lr)}` : '—';
+  $('#lrS').textContent = r.numeric ? `titer ${r.lrT}${r.cf < 1 ? ` · confounder ×${r.cf}` : ''}${r.lrP !== 1 ? ` · pattern ×${r.lrP.toFixed(1)}` : ''}` : '';
+  if (r.numeric) {
+    const mid = prob(odds(r.pre) * r.lrT * r.cf), d = (a, b) => { const x = Math.round((b - a) * 100); return x === 0 ? '' : `<span class="delta ${x > 0 ? 'up' : 'dn'}">${Math.abs(x)}% ${x > 0 ? '▲' : '▼'}</span>`; };
+    const row = (n, v, c, extra) => `<div class="lolli"><span class="meta">${n}</span><div class="rail"><div class="dot ${c}" style="left:${Math.min(98, v * 100)}%"></div></div><b class="font-medium text-[12px]">${pct(v, 0)}</b></div>${extra ? `<div class="text-right -mt-2">${extra}</div>` : ''}`;
+    $('#shift').innerHTML = row('Pre-test', r.pre, 'c') + row('After titer', mid, 'c', d(r.pre, mid)) + row('Final', r.post, '', d(mid, r.post)) + `<p class="meta t mt-1">Pattern, confounders and the 26× cap are applied in the final step.</p>`;
+  } else $('#shift').innerHTML = `<p class="meta">No numeric path for this branch.</p>`;
+  $('#ctx').innerHTML = ctxChips();
+  $('#steps').innerHTML = `<div class="${lastTier !== r.tier ? 'enter' : ''}"><div class="text-[17px] font-medium tracking-tight mb-1">${T.head}</div>
+   <div class="group-l">Order</div><ul class="list">${P.order.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+   ${P.avoid.length ? `<div class="group-l">Avoid</div><ul class="list no">${P.avoid.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+   ${P.notes.length ? `<div class="group-l">Also consider</div><ul class="list note">${P.notes.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+   ${P.script ? `<div class="group-l">What to say</div><div class="well meta" style="color:var(--ink)">${esc(P.script)}</div>` : ''}</div>`;
+  lastTier = r.tier; window._res = { r, P, lo, hi }; updateHS();
+  $('#mbPill').innerHTML = `<span class="pill ${T.pill}"><i></i>${T.label}</span>`; $('#mbTxt').textContent = r.numeric ? `post-test ${pct(r.post)}` : '';
+}
+function summaryText() {
+  const { r, P, lo, hi } = window._res, T = CFG.titerSpectrum[S.titer];
+  const titer = S.method === 'sp' ? `solid-phase: ${COMBO[S.combo]}` : `${S.legacy ? T.legacy32 : T.std} (${S.legacy ? 'legacy 1:32 series' : 'standard series'})`;
+  const sym = [...S.sym].map((k) => SHORT[k]).join('; ') || 'none entered';
+  return [`ANA decision summary (decision support, not a diagnosis)`, `Disposition: ${TIER[r.tier].head}`,
+    r.numeric ? `Estimate: pre-test ${pct(r.pre)} → post-test ${pct(r.post)} (range ${rng(lo.post, hi.post)}); clinical score ${r.score}` : `Estimate: not computed (${r.tier === 'URGENT' ? 'red flag' : 'pediatric rules'})`,
+    `ANA: ${titer}; pattern ${S.method === 'iif' ? PM[S.pattern].code === '?' ? 'not reported' : 'AC-' + PM[S.pattern].code : 'n/a'}`, `Findings: ${sym}`,
+    S.red.size ? `Red flags: ${[...S.red].map((k) => RED[k]).join('; ')}` : 'Red flags: none', `Suggested orders: ${P.order.join('; ')}`, P.notes.length ? `Notes: ${P.notes.join(' ')}` : ''].filter(Boolean).join('\n');
+}
+/* ---------- PDF report (jsPDF is loaded on first use) ---------- */
+let jspdfP;
+const loadJsPdf = () => (jspdfP ||= new Promise((res, rej) => {
+  if (window.jspdf) return res(window.jspdf);
+  const sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+  sc.onload = () => res(window.jspdf); sc.onerror = () => { jspdfP = null; rej(new Error('Could not load the PDF library (needs an internet connection).')); }; document.head.append(sc);
+}));
+const pdfSafe = (t) => String(t).replace(/≥/g, '>=').replace(/≤/g, '<=').replace(/→/g, ' to ').replace(/×/g, 'x').replace(/[–—]/g, '-').replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/γ/g, 'gamma').replace(/·/g, '-').replace(/°/g, ' deg').replace(/…/g, '...').replace(/[^\x20-\x7E\n]/g, '');
+async function buildPdf() {
+  const { jsPDF } = await loadJsPdf(), R = window._res; if (!R) throw new Error('Nothing to report yet.');
+  const { r, P, lo, hi } = R, T = TIER[r.tier], tl = CFG.titerSpectrum[S.titer], doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight(), M = 44, CW = W - 2 * M; let y = M;
+  const ensure = (n) => { if (y + n > H - 58) { doc.addPage(); y = M; } };
+  const txt = (s, o = {}) => { const { size = 10, style = 'normal', color = [17, 20, 24], gap = 4, indent = 0 } = o; doc.setFont('helvetica', style); doc.setFontSize(size); doc.setTextColor(...color);
+    for (const ln of doc.splitTextToSize(pdfSafe(s), CW - indent)) { ensure(size + gap); doc.text(ln, M + indent, y + size); y += size + gap; } };
+  const head = (s) => { y += 8; ensure(30); txt(s, { size: 12, style: 'bold', gap: 3 }); doc.setDrawColor(215, 221, 228); doc.line(M, y, W - M, y); y += 7; };
+  const bullets = (a) => a.forEach((x) => txt('- ' + x, { indent: 8, gap: 3 }));
+  txt('Positive ANA decision summary', { size: 20, style: 'bold', gap: 6 });
+  txt(`Generated ${new Date().toLocaleString('en-GB')}. Educational decision support, not a diagnosis.`, { size: 9, color: [107, 116, 128], gap: 10 });
+  const band = r.tier === 'GREEN' ? [215, 240, 227] : r.tier === 'YELLOW' ? [246, 226, 122] : [251, 221, 222];
+  ensure(70); doc.setFillColor(...band); doc.roundedRect(M, y, CW, 54, 12, 12, 'F'); doc.setFont('helvetica', 'bold'); doc.setFontSize(15); doc.setTextColor(17, 20, 24); doc.text(pdfSafe(T.head), M + 16, y + 24);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.text(pdfSafe(r.numeric ? `Pre-test ${pct(r.pre)} -> post-test about ${pct(r.post)} (likely ${rng(lo.post, hi.post)}). Clinical score ${r.score}.` : r.tier === 'URGENT' ? 'Red flag selected: no estimate is calculated.' : 'Child mode: rules only, no numeric estimate.'), M + 16, y + 42); y += 66;
+  head('ANA result');
+  txt(S.method === 'sp' ? `Solid-phase assay: ${COMBO[S.combo]}` : `HEp-2 IIF titer ${S.legacy ? tl.legacy32 + ' (legacy 1:32 series)' : tl.std}. Pattern: ${S.pattern === 'UNSPEC' ? 'not reported' : CFG.icapPatterns.find((p) => p.id === S.pattern).name + ' (AC-' + PM[S.pattern].code + ')'}.`);
+  if (r.numeric) txt(`Likelihood ratios: titer x${r.lrT}${r.cf < 1 ? `, confounder x${r.cf}` : ''}${r.lrP !== 1 ? `, pattern x${r.lrP.toFixed(1)}` : ''}; combined x${r.lr.toFixed(1)} (cap ${CFG.engineParameters.combinedLrCap}).`, { color: [107, 116, 128] });
+  head('Clinical findings');
+  const sel = []; for (const d of CFG.clinicalDomains) for (const i of d.items) if (S.sym.has(i.id)) sel.push(`${i.label} (${i.weight > 0 ? '+' : ''}${i.weight} pts, grade ${i.grade})`);
+  if (sel.length) { bullets(sel); txt('Only the highest-weighted finding in each domain counts toward the score.', { size: 9, color: [107, 116, 128] }); } else txt('None entered.');
+  if (S.red.size) { head('Red flags'); bullets([...S.red].map((k) => RED[k])); }
+  const ctx = [...S.conf].map((k) => CONF[k]).concat(S.peds ? ['Child (<18)'] : [], S.ab ? ['Specific antibody positive'] : [], S.labs ? ['Baseline labs abnormal'] : [], S.preg ? ['Pregnant / planning'] : [], S.ro ? ['Anti-Ro known'] : []);
+  if (ctx.length) { head('Context'); bullets(ctx); }
+  head('Suggested next steps'); if (P.order.length) { txt('Order', { style: 'bold', gap: 2 }); bullets(P.order); }
+  if (P.avoid.length) { txt('Avoid', { style: 'bold', gap: 2 }); bullets(P.avoid); } if (P.notes.length) { txt('Also consider', { style: 'bold', gap: 2 }); bullets(P.notes); }
+  if (P.script) { head('What to tell the patient'); txt(P.script); }
+  const snap = window.Body?.snapshot?.();
+  if (snap && S.sym.size) { const iw = 100, ih = iw * snap.h / snap.w; ensure(ih + 40); head('Selected findings on the body map'); doc.addImage(snap.url, 'JPEG', M, y, iw, ih); y += ih + 6; }
+  const n = doc.getNumberOfPages();
+  for (let p = 1; p <= n; p++) { doc.setPage(p); doc.setDrawColor(215, 221, 228); doc.line(M, H - 48, W - M, H - 48); doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(107, 116, 128);
+    doc.text(doc.splitTextToSize(pdfSafe('Educational decision-support prototype. Not a diagnosis, not a medical device, not validated on patients. Percentages are illustrative ranges from design assumptions (evidence grade D) and need local calibration. Supports, and does not replace, clinical judgement.'), CW - 60), M, H - 38); doc.text(`${p} / ${n}`, W - M, H - 38, { align: 'right' }); }
+  return doc;
+}
+async function downloadPdf() {
+  const l = $('#pdfLbl'); l.textContent = 'Preparing...';
+  try { const doc = await buildPdf(); doc.save(`ANA-summary-${new Date().toISOString().slice(0, 10)}.pdf`); l.textContent = 'Downloaded'; }
+  catch (e) { l.textContent = 'PDF failed: ' + e.message; }
+  setTimeout(() => (l.textContent = 'Download PDF report'), 2600);
+}
+async function copySummary() { const l = $('#copyLbl'); try { await navigator.clipboard.writeText(summaryText()); l.textContent = 'Copied'; } catch { l.textContent = 'Select and copy from Next steps'; } setTimeout(() => (l.textContent = 'Copy referral summary'), 1800); }
+function resetAll() { Object.assign(S, { method: 'iif', legacy: false, titer: 2, combo: 'both_pos', pattern: 'UNSPEC', dfs: false, peds: false, ab: false, labs: false, preg: false, ro: false, zoom: 1, yaw: 0 }); S.sym.clear(); S.red.clear(); S.conf.clear(); all(); }
+
+/* ---------- events ---------- */
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-k]'); if (!b || S.tab !== 'calc' || b.closest('#view-chal')) return;
+  const { k, id } = b.dataset, tog = (set) => (set.has(id) ? set.delete(id) : set.add(id));
+  if (k === 'sym') tog(S.sym); else if (k === 'red') tog(S.red); else if (k === 'conf') tog(S.conf);
+  else if (k === 'tog') S[id] = !S[id]; else if (k === 'titer') S.titer = +id; else if (k === 'method') S.method = id;
+  else if (k === 'scale') S.legacy = id === 'leg'; else if (k === 'combo') S.combo = id; else return;
+  if (['method', 'titer', 'scale', 'combo', 'sym', 'red'].includes(k)) renderL(); renderR(); if (k === 'method') { drawHero(); place(); heroState(); }
+});
+
+/* ---------- body map ---------- */
+// a = GLB anchor (metres), d = offset to the skin surface, n = outward normal (facing fade), opts = findings the marker toggles,
+// names = region-specific wording, side = label side when the marker is near the midline. Every scored clinical item is reachable here.
+const HS = [
+  { label: 'Scalp and hair', sh: 'Scalp', a: 'eyes', d: [0, .12, 0], n: [0, .5, .85], side: 'r', opts: ['oral_ulcer_alopecia', 'scle_discoid'], names: { oral_ulcer_alopecia: 'Non-scarring alopecia', scle_discoid: 'Scarring (discoid) plaques' } },
+  { label: 'Nervous system', sh: 'Nerves', a: 'eyes', d: [.078, .04, 0], n: [.85, 0, .5], side: 'r', opts: ['seizure', 'psychosis', 'delirium'] },
+  { label: 'Face and mouth', sh: 'Face', a: 'eyes', d: [-.012, -.05, .05], n: [0, 0, 1], side: 'l', opts: ['acute_cutaneous_lupus', 'gottron_heliotrope', 'telangiectasia', 'objective_sicca', 'oral_ulcer_alopecia'], names: { acute_cutaneous_lupus: 'Malar or photosensitive rash', gottron_heliotrope: 'Heliotrope (violet eyelids)', telangiectasia: 'Facial telangiectasia', objective_sicca: 'Dry eyes, dry mouth or parotid swelling', oral_ulcer_alopecia: 'Painless oral ulcers' } },
+  { label: 'Fever', sh: 'Fever', a: 'chin', d: [0, -.115, .085], n: [0, 0, 1], side: 'l', opts: ['fever'] },
+  { label: 'Pleura and lungs', sh: 'Lungs', a: 'rLung', d: [-.035, .06, .105], n: [0, 0, 1], side: 'l', opts: ['effusion', 'ild_pah'], names: { effusion: 'Pleuritis or pleural effusion', ild_pah: 'Interstitial lung disease or PAH' } },
+  { label: 'Heart sac', sh: 'Heart', a: 'heart', d: [.02, .03, .115], n: [0, 0, 1], side: 'r', opts: ['pericarditis', 'effusion'], names: { pericarditis: 'Acute pericarditis', effusion: 'Pericardial effusion' } },
+  { label: 'Blood counts', sh: 'Blood', a: 'lKid', d: [.05, .075, .12], n: [0, 0, 1], side: 'r', opts: ['leukopenia', 'thrombocytopenia', 'hemolysis'] },
+  { label: 'Kidney', sh: 'Kidney', a: 'rKid', d: [-.098, 0, .02], n: [-.8, 0, .6], side: 'l', opts: ['proteinuria'] },
+  { label: 'Sun-exposed skin', sh: 'Sun rash', a: 'lHand', d: [-.03, .17, .06], n: [.3, 0, 1], side: 'r', opts: ['acute_cutaneous_lupus', 'scle_discoid'], names: { acute_cutaneous_lupus: 'Photosensitive rash', scle_discoid: 'Annular or discoid plaques' } },
+  { label: 'Hand joints', sh: 'Hand', a: 'rHand', d: [0, .03, .045], n: [0, 0, 1], side: 'l', opts: ['synovitis'] },
+  { label: 'Fingers and skin', sh: 'Fingers', a: 'lHand', d: [.012, -.045, .045], n: [0, 0, 1], side: 'r', opts: ['raynaud', 'puffy_fingers', 'sclerodactyly', 'skin_thickening_proximal_mcp', 'digital_ulcer', 'gottron_heliotrope', 'mechanics_hands'], names: { gottron_heliotrope: 'Gottron papules (knuckles)', skin_thickening_proximal_mcp: 'Skin thickening above the knuckles' } },
+  { label: 'Thigh muscles', sh: 'Thigh', a: 'lThigh', d: [0, 0, .08], n: [0, 0, 1], side: 'r', opts: ['proximal_weakness'] },
+  { label: 'Knee', sh: 'Knee', a: 'rKnee', d: [0, 0, .075], n: [0, 0, 1], side: 'l', opts: ['synovitis'] },
+  { label: 'Calf', sh: 'Calf', a: 'rKnee', d: [0, -.18, .05], n: [0, 0, 1], side: 'l', opts: ['thrombosis_pregnancy_loss'], names: { thrombosis_pregnancy_loss: 'Unprovoked clot or recurrent pregnancy loss' } }];
+const LAYERS = [['skin', 'Skin'], ['muscles', 'Muscle'], ['skeleton', 'Bone'], ['organs', 'Organs']];
+const optName = (h, id) => h.names?.[id] || SHORT[id] || id;
+let popI = null;
+function renderHS() {
+  $('#hs').innerHTML = '<svg id="hsLines" aria-hidden="true"></svg>' + HS.map((h, i) => {
+    const one = h.opts.length === 1, at = one ? `data-k="sym" data-id="${h.opts[0]}"` : `data-pop="${i}" aria-haspopup="true"`;
+    return `<button class="hsd" ${at} data-hs="${i}" aria-label="${h.label}"></button><button class="hsl ${i % 2 ? 'alt' : ''}" ${at} data-hs="${i}"><span class="full">${h.label}</span><span class="sh">${h.sh}</span><em class="cnt" hidden></em></button>`;
+  }).join('') + '<div class="pop" id="pop" hidden></div>';
+}
+function fillPop(i) {
+  const h = HS[i];
+  $('#pop').innerHTML = `<h5>${h.label}</h5><div class="flex flex-wrap gap-1.5">${h.opts.map((id) => chipBtn('sm', 'sym', id, S.sym.has(id), optName(h, id))).join('')}</div>`;
+}
+function openPop(i) {
+  if (popI === i) return closePop();
+  popI = i; fillPop(i); const pop = $('#pop'), box = $('#hs'), pos = (window.HSPOS || [])[i] || { x: 100, y: 100 };
+  pop.hidden = false; const W = box.clientWidth, H = box.clientHeight, pw = pop.offsetWidth, ph = pop.offsetHeight;
+  pop.style.left = Math.min(Math.max(6, pos.x - pw / 2), W - pw - 6) + 'px';
+  pop.style.top = (pos.y + 24 + ph > H - 6 ? Math.max(6, pos.y - 24 - ph) : pos.y + 24) + 'px';
+}
+function closePop() { popI = null; const p = $('#pop'); if (p) p.hidden = true; }
+window.closePop = closePop;
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-pop]'); if (b) return openPop(+b.dataset.pop);
+  if (!e.target.closest('#pop')) closePop();
+});
+function updateHS() {
+  document.querySelectorAll('#hs [data-hs]').forEach((e) => {
+    const h = HS[+e.dataset.hs], n = h.opts.filter((id) => S.sym.has(id)).length; e.classList.toggle('on', n > 0);
+    const c = e.querySelector('.cnt'); if (c) { c.hidden = n < 1 || h.opts.length === 1; c.textContent = n; }
+    if (e.classList.contains('hsd') && h.opts.length === 1) e.setAttribute('aria-pressed', n > 0);
+  });
+  if (popI !== null) fillPop(popI);
+}
+function applyView() { renderDial(); requestAnimationFrame(() => { drawHero(); place(); heroState(); }); window.Body?.start(); }
+window.bodyFailed = () => {};
+
+/* ---------- HEp-2 canvas ---------- */
+const CELLS = [[-.42, -.32, .2, .15, .5], [-.05, -.56, .17, .13, -.3], [-.58, .14, .19, .15, .2], [-.2, .3, .2, .16, -.6], [.05, .03, .14, .11, .9], [.12, .6, .18, .14, .1], [.58, -.4, .17, .13, -.5], [.64, .32, .16, .13, .7]];
+const MIT = [.33, -.1, -.35];
+const rand = (seed) => () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+function glow(x, px, py, r, a, col = '120,250,165') { const g = x.createRadialGradient(px, py, 0, px, py, r); g.addColorStop(0, `rgba(${col},${a})`); g.addColorStop(1, `rgba(${col},0)`); x.fillStyle = g; x.beginPath(); x.arc(px, py, r, 0, 7); x.fill(); }
+const inDisc = (R, rnd) => { const a = rnd() * 6.283, d = Math.sqrt(rnd()) * R; return [Math.cos(a) * d, Math.sin(a) * d]; };
+function nucleus(x, cell, mode, rnd, idx) {
+  const [cx, cy, rx, ry, rot] = cell;
+  if (mode === 'variable') mode = ['homog', 'fine', 'blank'][idx % 3];
+  x.save(); x.translate(cx, cy); x.rotate(rot); x.scale(rx, ry);
+  if (['cyto', 'reticular', 'fibres', 'golgi'].includes(mode)) { // cytoplasm lives outside the nucleus
+    x.globalCompositeOperation = 'lighter';
+    if (mode === 'cyto') for (let i = 0; i < 110; i++) { const a = rnd() * 6.283, d = 1.1 + rnd() * 1.2; glow(x, Math.cos(a) * d, Math.sin(a) * d, .13, .32); }
+    if (mode === 'reticular') { x.strokeStyle = 'rgba(120,250,165,.5)'; x.lineWidth = .05; for (let i = 0; i < 26; i++) { const a = rnd() * 6.283, d = 1.1 + rnd() * .9; x.beginPath(); x.moveTo(Math.cos(a) * d, Math.sin(a) * d); x.quadraticCurveTo(Math.cos(a + .6) * (d + .5), Math.sin(a + .6) * (d + .5), Math.cos(a + 1) * (d + .1), Math.sin(a + 1) * (d + .1)); x.stroke(); } }
+    if (mode === 'fibres') { x.strokeStyle = 'rgba(120,250,165,.55)'; x.lineWidth = .04; for (let i = 0; i < 38; i++) { const a = rnd() * 6.283, d = 1.1; x.beginPath(); x.moveTo(Math.cos(a) * d, Math.sin(a) * d); x.lineTo(Math.cos(a + .15) * (d + 1.3), Math.sin(a + .15) * (d + 1.3)); x.stroke(); } }
+    if (mode === 'golgi') for (let i = 0; i < 3; i++) glow(x, 1.25 + i * .05, -.4 + i * .4, .32, .8);
+    x.beginPath(); x.arc(0, 0, 1, 0, 7); x.fillStyle = 'rgba(2,10,10,.7)'; x.globalCompositeOperation = 'source-over'; x.fill();
+    x.restore(); return;
+  }
+  x.beginPath(); x.arc(0, 0, 1, 0, 7); x.clip(); x.globalCompositeOperation = 'lighter';
+  const base = (a) => { x.fillStyle = `rgba(110,240,150,${a})`; x.beginPath(); x.arc(0, 0, 1, 0, 7); x.fill(); };
+  const nucleoli = (a = .45) => { x.globalCompositeOperation = 'source-over'; glow(x, .3, .2, .24, a, '4,16,12'); glow(x, -.36, -.26, .2, a, '4,16,12'); x.globalCompositeOperation = 'lighter'; };
+  const scatter = (n, r, a, R = 1) => { for (let i = 0; i < n; i++) { const [px, py] = inDisc(R, rnd); glow(x, px, py, r * (.7 + rnd() * .6), a); } };
+  if (mode === 'homog') { base(.52); glow(x, 0, 0, 1.2, .3); nucleoli(.3); }
+  else if (mode === 'fine') { base(.1); scatter(230, .12, .22); nucleoli(); }
+  else if (mode === 'fine2') { base(.08); scatter(150, .06, .5); nucleoli(.3); }
+  else if (mode === 'coarse') { base(.08); scatter(52, .2, .34); nucleoli(); }
+  else if (mode === 'dfs') { base(.22); scatter(280, .13, .34); nucleoli(.25); }
+  else if (mode === 'dots') { base(.04); scatter(44, .1, .95, .88); }
+  else if (mode === 'fewdots') { base(.05); scatter(7, .15, .95, .7); }
+  else if (mode === 'nucleolar') { base(.1); for (let i = 0; i < 3; i++) { const [px, py] = inDisc(.5, rnd); glow(x, px, py, .33, .95); } }
+  else if (mode === 'envelope') { base(.04); for (let i = 0; i < 46; i++) { const a = (i / 46) * 6.283; glow(x, Math.cos(a) * .92, Math.sin(a) * .92, .13, .75); } }
+  else if (mode === 'topo') { base(.18); scatter(150, .12, .22); for (let i = 0; i < 3; i++) { const [px, py] = inDisc(.5, rnd); glow(x, px, py, .26, .85); } }
+  else if (mode === 'blank') base(.03);
+  else base(.1), scatter(70, .1, .14);
+  x.restore();
+}
+function mitosis(x, pm, rnd) {
+  x.save(); x.translate(MIT[0], MIT[1]); x.rotate(MIT[2]); x.globalCompositeOperation = 'lighter';
+  x.save(); x.scale(1, .72); glow(x, 0, 0, .25, ['cyto', 'reticular', 'fibres'].includes(pm.mode) ? .3 : .11); x.restore();
+  if (pm.mode === 'cyto') for (let i = 0; i < 60; i++) { const [px, py] = inDisc(.22, rnd); glow(x, px, py * .7, .035, .5); }
+  if (pm.plate === 'bright') for (let i = 0; i < 26; i++) glow(x, -.15 + (i / 25) * .3, (rnd() - .5) * .025, .055, pm.mode === 'dfs' ? .4 : .62);
+  if (pm.plate === 'aligned') for (let i = 0; i < 16; i++) glow(x, -.15 + (i / 15) * .3, (rnd() - .5) * .03, .03, .98);
+  if (pm.plate === 'spindle') { x.strokeStyle = 'rgba(120,250,165,.6)'; x.lineWidth = .006; for (let i = -4; i <= 4; i++) { x.beginPath(); x.moveTo(-.22, 0); x.quadraticCurveTo(0, i * .018, .22, 0); x.stroke(); } glow(x, -.22, 0, .05, .95); glow(x, .22, 0, .05, .95); }
+  if (pm.plate === 'dark') { x.globalCompositeOperation = 'source-over'; for (let i = 0; i < 18; i++) glow(x, -.14 + (i / 17) * .28, 0, .05, .75, '3,12,10'); }
+  x.restore();
+}
+function drawHero() {
+  const cv = $('#cv'), W = cv.clientWidth; if (!W) return;
+  const d = window.devicePixelRatio || 1; cv.width = cv.height = Math.round(W * d);
+  const x = cv.getContext('2d'); x.scale(d, d);
+  const bg = x.createRadialGradient(W / 2, W / 2, 0, W / 2, W / 2, W / 2); bg.addColorStop(0, '#12262b'); bg.addColorStop(1, '#070f12'); x.fillStyle = bg; x.fillRect(0, 0, W, W);
+  const pm = PM[S.method === 'iif' ? S.pattern : 'UNSPEC'] || PM.UNSPEC;
+  x.translate(W / 2, W / 2); x.scale((W / 2) * S.zoom, (W / 2) * S.zoom);
+  const rnd = rand(97);
+  CELLS.forEach((c, i) => nucleus(x, c, pm.mode, rnd, i)); mitosis(x, pm, rnd);
+}
+function heroState() {
+  const off = S.method !== 'iif'; const n = $('#heroNote'); n.hidden = !off; n.textContent = off ? 'Solid-phase assays do not report an ICAP pattern. Switch to IIF to explore patterns.' : '';
+  $('#dial').style.opacity = off ? .35 : 1; $('#dial').style.pointerEvents = off ? 'none' : 'auto';
+  $('#scopeDesc').hidden = off || S.pattern === 'UNSPEC';
+}
+// what to look for, shown beside the field instead of pointing at cells
+function place() {
+  const pm = PM[S.pattern] || PM.UNSPEC;
+  $('#scopeDesc').innerHTML = `<div class="sd"><i style="background:var(--coral)"></i><div><b>In the nucleus</b><span>${esc(pm.a)}</span></div></div><div class="sd"><i style="background:var(--cobalt)"></i><div><b>In dividing cells</b><span>${esc(pm.b)}</span></div></div>`;
+}
+/* dial */
+const DC = [300, 330], DR = 300, A0 = 135, A1 = 45;
+const dpt = (i, r = DR) => { const t = (A0 + (A1 - A0) * (i / (PIDS.length - 1))) * Math.PI / 180; return [DC[0] + r * Math.cos(t), DC[1] - r * Math.sin(t)]; };
+function renderDial() {
+  const i = PIDS.indexOf(S.pattern), a = dpt(0), b = dpt(PIDS.length - 1), k = dpt(i);
+  $('#dial').innerHTML = `<path d="M${a} A${DR} ${DR} 0 0 1 ${b}" fill="none" stroke="#C9D1DA" stroke-width="1.5"/>` +
+    PIDS.map((id, j) => { const p = dpt(j, DR - 4), q = dpt(j, DR - 18); return `<line class="tick ${j === i ? 'on' : ''}" x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}"/><text x="${dpt(j, DR - 34)[0]}" y="${dpt(j, DR - 34)[1] + 4}" text-anchor="middle" font-size="11" fill="${j === i ? '#111418' : '#A3ABB5'}" font-weight="${j === i ? 600 : 400}">${PM[id].code}</text>`; }).join('') +
+    `<circle cx="${k[0]}" cy="${k[1]}" r="13" fill="#F6E27A" stroke="#fff" stroke-width="3"/><circle cx="${k[0]}" cy="${k[1]}" r="3.5" fill="#111418"/>`;
+  const p = CFG.icapPatterns[i], m = PM[p.id];
+  $('#pinfo').innerHTML = `<div class="flex justify-center gap-2 flex-wrap"><span class="pill y"><i></i>${p.id === 'UNSPEC' ? 'No code' : 'AC-' + m.code}</span><span class="pill b"><i></i>${p.grade === '-' ? 'Reported by lab' : 'Evidence grade ' + p.grade}</span></div>
+   <h2>${esc(p.name)}</h2><p class="meta">${esc(m.ab)} · ${esc(m.dis)}</p>${p.caveat ? `<p class="meta t mt-1">${esc(p.caveat)}</p>` : ''}`;
+}
+function setPattern(i) { i = Math.max(0, Math.min(PIDS.length - 1, i)); if (PIDS[i] === S.pattern) return; S.pattern = PIDS[i]; S.dfs = S.dfs && S.pattern === 'AC-2'; renderDial(); drawHero(); place(); heroState(); renderR(); }
+const dial = $('#dial');
+function dialPick(e) { const pt = dial.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const q = pt.matrixTransform(dial.getScreenCTM().inverse()); let ang = Math.atan2(DC[1] - q.y, q.x - DC[0]) * 180 / Math.PI; ang = Math.max(A1, Math.min(A0, ang)); setPattern(Math.round((A0 - ang) / (A0 - A1) * (PIDS.length - 1))); }
+dial.addEventListener('pointerdown', (e) => { dial.setPointerCapture(e.pointerId); dialPick(e); dial.onpointermove = dialPick; });
+dial.addEventListener('pointerup', () => (dial.onpointermove = null));
+dial.addEventListener('keydown', (e) => { const i = PIDS.indexOf(S.pattern); if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); setPattern(i + 1); } if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); setPattern(i - 1); } });
+const zoomTo = (z) => { S.zoom = Math.max(1, Math.min(2.6, z)); drawHero(); place(); };
+$('#zIn').onclick = () => zoomTo(S.zoom + .4); $('#zOut').onclick = () => zoomTo(S.zoom - .4);
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if (S.tab === 'calc') { drawHero(); place(); } }, 120); });
+
+/* ---------- challenge ---------- */
+const CH = { i: 0, score: 0, cost: 0, done: 0, answered: null, order: [] };
+const COST = { dismiss: 0, targeted: 6, refer: 3 };
+const MATRIX = { dismiss: { dismiss: 10, targeted: -5, refer: -15, urgent: -30 }, targeted: { dismiss: -3, targeted: 10, refer: -3, urgent: -20 }, refer: { dismiss: -5, targeted: -2, refer: 10, urgent: 10 } };
+const truthOf = (t) => ({ GREEN: 'dismiss', YELLOW: 'targeted', RED_ROUTINE: 'refer', RED_EXPEDITED: 'refer', URGENT: 'urgent' }[t]);
+const needCost = (tr) => (tr === 'dismiss' ? 0 : tr === 'targeted' ? 6 : 3);
+function chalStart() { CH.order = CASES.map((_, i) => i).sort(() => Math.random() - .5); Object.assign(CH, { i: 0, score: 0, cost: 0, done: 0, answered: null }); }
+function chalRender() {
+  if (!CH.order.length) chalStart();
+  const left = `<section class="card"><div class="card-h"><span class="ico">${ic('target')}</span><h3>Your round</h3></div><div class="big">${CH.score}<span class="unit">points</span></div>
+    <div class="well mt-3"><div class="flex justify-between"><span class="meta">Case</span><b class="font-medium text-[13px]">${Math.min(CH.i + 1, CASES.length)} / ${CASES.length}</b></div><div class="rail mt-2"><b style="width:${CH.done / CASES.length * 100}%;background:var(--ink)"></b></div></div>
+    <div class="well mt-3"><div class="meta">Test units spent</div><div class="big" style="font-size:26px">${CH.cost}</div><p class="meta t mt-1">Relative units, not prices: baseline labs 4, targeted antibodies 2, referral 3.</p></div></section>
+    <section class="card"><div class="card-h"><h3>How it scores</h3></div><p class="meta">+10 for the right call. Missing urgent disease costs the most. Over-testing a benign case costs points and shows the false-positive cascade. Restraint is rewarded.</p></section>`;
+  let mid;
+  if (CH.done >= CASES.length) mid = `<section class="card text-center py-10"><div class="big">${CH.score}</div><p class="meta mt-2">out of ${CASES.length * 10} possible · ${CH.cost} test units</p><h2 class="text-[22px] font-medium mt-4">Round complete</h2><div class="max-w-xs mx-auto mt-5"><button class="cta" id="chalAgain"><span>Play again</span><span class="go">${ic('arrow')}</span></button></div></section>`;
+  else {
+    const k = CASES[CH.order[CH.i]], T = CFG.titerSpectrum.find((t) => t.id === k.input.titerId), p = k.input.patternId;
+    const a = CH.answered;
+    mid = `<section class="card enter" style="padding:24px"><div class="card-h"><span class="ico">${ic('scan')}</span><h3>Consult ${CH.i + 1}</h3><span class="ml-auto pill b"><i></i>${k.input.pediatric ? 'Child' : 'Adult'}</span></div>
+     <p class="text-[17px] leading-snug" style="letter-spacing:-.01em">${esc(k.vignette)}</p>
+     <div class="flex gap-2 mt-4 flex-wrap"><span class="pill y"><i></i>ANA ${T.std}</span><span class="pill b"><i></i>${p === 'UNSPEC' ? 'Pattern not coded' : esc(CFG.icapPatterns.find((x) => x.id === p).name)}</span>${k.input.dfs70Confirmed ? '<span class="pill g"><i></i>Anti-DFS70 confirmed</span>' : ''}</div>
+     <div class="flex gap-2 mt-6 flex-wrap">${[['dismiss', 'Dismiss'], ['targeted', 'Order targeted work-up'], ['refer', 'Refer to rheumatology']].map(([id, l]) => `<button class="btn-big" data-ch="${id}" aria-pressed="${a?.choice === id}" ${a ? 'disabled' : ''}>${l}</button>`).join('')}</div>
+     ${a ? `<div class="mt-5"><button class="cta" id="chalNext"><span>${CH.i + 1 >= CASES.length ? 'See results' : 'Next consult'}</span><span class="go">${ic('arrow')}</span></button></div>` : ''}</section>`;
+  }
+  let right = `<section class="card"><div class="card-h"><span class="ico">${ic('book')}</span><h3>Feedback</h3></div><p class="meta">Make a call to see the evidence-based answer, the numbers behind it and what the test cost.</p></section>`;
+  if (CH.answered && CH.done <= CASES.length) {
+    const a = CH.answered, k = CASES[CH.order[CH.i]], r = a.r, tr = a.truth, good = a.pts >= 10;
+    right = `<section class="card enter"><div class="card-h"><span class="ico">${ic('book')}</span><h3>Feedback</h3><span class="ml-auto pill ${good ? 'g' : a.pts > -6 ? 'y' : 'r'}"><i></i>${a.pts > 0 ? '+' : ''}${a.pts} pts</span></div>
+     <div class="text-[16px] font-medium mb-1">${good ? 'Right call' : 'Not quite'}: ${TIER[r.tier].head}</div>
+     <p class="meta mb-3" style="color:var(--ink)">${esc(k.teach)}</p>
+     <div class="well"><div class="flex justify-between meta"><span>Pre-test → post-test</span><b class="font-medium" style="color:var(--ink)">${r.numeric ? pct(r.pre) + ' → ' + pct(r.post) : 'rules only'}</b></div>
+     <div class="flex justify-between meta mt-2"><span>Test units</span><b class="font-medium" style="color:var(--ink)">${COST[a.choice]} spent · ${needCost(tr)} needed</b></div></div>
+     ${a.choice !== 'dismiss' && tr === 'dismiss' ? `<p class="meta mt-3"><span class="pill r"><i></i>False-positive cascade risk</span> Testing a low-probability case invites a spurious positive and follow-on work-up.</p>` : ''}
+     ${a.choice === 'dismiss' && (tr === 'refer' || tr === 'urgent') ? `<p class="meta mt-3"><span class="pill r"><i></i>Missed disease</span> ${tr === 'urgent' ? 'A red flag was present.' : 'Objective features were present.'}</p>` : ''}</section>`;
+  }
+  $('#view-chal').innerHTML = `<div class="grid gap-3 content-start order-2 lg:order-1">${left}</div><div class="grid gap-3 content-start order-1 lg:order-2">${mid}</div><div class="grid gap-3 content-start order-3">${right}</div>`;
+}
+$('#view-chal').addEventListener('click', (e) => {
+  const c = e.target.closest('[data-ch]');
+  if (c && !CH.answered) { const k = CASES[CH.order[CH.i]], r = calc(k.input, CFG), tr = truthOf(r.tier), pts = MATRIX[c.dataset.ch][tr];
+    CH.answered = { choice: c.dataset.ch, truth: tr, r, pts }; CH.score += pts; CH.cost += COST[c.dataset.ch]; CH.done++; chalRender(); return; }
+  if (e.target.closest('#chalNext')) { CH.i++; CH.answered = null; chalRender(); }
+  if (e.target.closest('#chalAgain')) { chalStart(); chalRender(); }
+});
+
+/* ---------- education ---------- */
+const EDU = [
+ { h: 'ANA under the microscope', p: 'Patient serum is layered over cells; a green fluorescent antibody shows where antibodies bound. Read three things: how bright the stain stays as the serum is diluted (titer), where it sits in the cell (pattern), and whether the condensed chromosomes of dividing cells (the metaphase plate) are stained or dark. Cell-based (HEp-2) panels come first and the older liver-tissue slides last. Real slides vary by lab, so use these as orientation, not as a training set.', items: [
+  ['ana_main_patterns', 'Main patterns, schematic', 'Schematic', 'Speckled, homogeneous, mixed, nucleolar, centromere and peripheral (rim) patterns drawn side by side. This is an illustration, not a real slide.'],
+  ['hep2_ac1_ac2', 'Homogeneous and dense fine speckled on HEp-2', 'AC-1 · AC-2', 'A: AC-1, uniform nuclear stain with a smooth, stained chromosome plate in dividing cells (anti-dsDNA positive here). B: a speckled pattern approaching homogeneous. C: AC-2, speckles of uneven size and brightness with nucleoli unstained and a strongly stained plate (anti-DFS70 positive). A stained plate separates these from AC-4 and AC-5.'],
+  ['hep2_ac4a_ac4b', 'Fine speckled: AC-4a and AC-4b', 'AC-4', 'A, AC-4a: a myriad of small discrete speckles in the interphase nuclei, typically anti-Ro60. B, AC-4b: even, uniform fine speckles. In both, nucleoli and the chromosome plate stay unstained.'],
+  ['hep2_homog_speckled_ac19', 'Homogeneous, speckled, mixed and cytoplasmic', 'AC-1 · AC-19', 'A: homogeneous. B: speckled. C: mixed homogeneous and cytoplasmic. D: cytoplasmic dense fine speckled (AC-19), linked to anti-PL-7, anti-PL-12 or ribosomal-P. Cytoplasmic staining is easy to miss, and some labs do not report it as “ANA positive”.'],
+  ['hep2_ac19_20_anti_oj', 'Cytoplasmic speckled (anti-OJ)', 'AC-19/20', 'Fine speckled staining throughout the cytoplasm, from a serum with high anti-OJ antibodies, one of the antisynthetase antibodies. Anti-OJ is not part of the usual ENA panel, so the pattern may be the only clue: ask about weakness, interstitial lung disease and mechanic’s hands.'],
+  ['hep2_pbc_patterns', 'Patterns that point to primary biliary cholangitis', 'AC-3 · 6 · 12 · 21', 'Top: antimitochondrial antibodies on rodent liver, kidney and stomach. Bottom, on HEp-2 cells: anticentromere (AC-3), multiple nuclear dots (AC-6), nuclear envelope (AC-12) and AMA (AC-21, a coarse filamentous cytoplasmic network).'],
+  ['hep2_dfs_vs_pseudo', 'True anti-DFS70 and a look-alike', 'AC-2', 'Row A: sera positive for anti-DFS70 show the dense fine speckled pattern. Row B: sera negative for anti-DFS70 can still give a similar “pseudo-DFS” pattern. This is why a DFS-like pattern needs a confirmatory anti-DFS70 test before it is called benign. DAPI (grey) shows the chromatin.'],
+  ['hep2_rods_rings', 'Rods and rings', 'AC-23', 'Elongated rod-shaped and ring-shaped structures in the cytoplasm (arrows A and B). Classically linked to hepatitis C treatment and low-yield for autoimmune rheumatic disease, so no ENA chase is needed.'],
+  ['ana_centromere', 'Centromere (AC-3)', 'AC-3', '40–80 discrete dots in each nucleus; in dividing cells the dots line up on the plate. Linked to limited systemic sclerosis, but also to primary biliary cholangitis and Sjögren’s, so check ALP/AMA as well as Raynaud and sicca.'],
+  ['ana_speckled_hep2', 'Speckled', 'AC-2 / 4 / 5', 'Granular nuclear staining. A report that only says “speckled” does not say which code it is: ask the lab. Here the chromosome plate of dividing cells is dark, which points toward fine or coarse speckled (AC-4/5) rather than DFS70 (AC-2), where the plate is stained.'],
+  ['ana_nucleolar', 'Nucleolar', 'AC-8 to 10', 'Stain concentrates in the nucleoli and the rest of the nucleus is dim. Associated with the systemic sclerosis spectrum and myositis overlap, but often high titer without disease; the specific antibody carries the meaning.'],
+  ['ana_dots_nucleolar', 'Nuclear dots with nucleolar staining', 'AC-6/7 + 8–10', 'A few to a dozen bright dots per nucleus (anti-Sp100 is the classic partner, seen in primary biliary cholangitis), here together with nucleolar staining.'],
+  ['ana_dot_ama', 'Nuclear dots with mitochondrial staining', 'AC-6/7 + AC-21', 'Besides the nuclear dots, the cytoplasm shows a fine network: antimitochondrial antibodies (AMA), the pattern of primary biliary cholangitis. Reminder that cytoplasmic patterns matter and are reported inconsistently.'],
+  ['ana_homogeneous_liver', 'Homogeneous nuclear staining', 'AC-1', 'Uniform nuclear stain, seen with anti-dsDNA, nucleosome and histone antibodies (SLE, drug-induced lupus). This example uses liver tissue as the substrate, an older method; cultured cells show more detail.'],
+  ['ana_speckled_liver', 'Speckled on liver tissue', 'Speckled', 'Granular nuclear staining on tissue substrate. Many labs now use cultured cells because they show patterns and dividing cells more clearly.'],
+  ['ana_negative_liver', 'Negative control', 'AC-0', 'No nuclear fluorescence. A negative IIF ANA makes lupus unlikely but does not exclude Sjögren’s, myositis or antisynthetase syndrome: anti-Ro and Jo-1 can be missed.'] ] },
+ { h: 'Skin and mucosa', p: 'Characterised, clinician-observed skin findings carry weight. “A rash” does not. Photosensitivity reported by the patient is not the same as a documented photosensitive rash.', items: [
+  ['malar_rash', 'Malar (butterfly) rash', 'Acute cutaneous lupus · 6 pts', 'Erythema over the cheeks and nasal bridge that characteristically spares the nasolabial folds. Rosacea involves the folds and often has pustules and telangiectasia, which is the key mimic to rule out.'],
+  ['rosacea', 'Rosacea: the main malar mimic', 'Mimic', 'Redness with papules and visible vessels that includes the nose and the nasolabial folds, and flares with heat, alcohol or sun. Lupus erythema characteristically spares the folds; pustules and telangiectasia point to rosacea.'],
+  ['scle', 'Subacute cutaneous lupus', 'SCLE · 4 pts', 'Photosensitive, non-scarring annular or papulosquamous plaques, often on sun-exposed skin. Strong association with anti-Ro/SSA, which also matters for pregnancy counselling.'],
+  ['discoid', 'Discoid lupus', 'Discoid · 4 pts', 'Scarring plaques with pigment change and, on the scalp, scarring alopecia. Most people with discoid lupus alone do not go on to develop SLE, but check for systemic features.'],
+  ['lupus_palatal_ulcers', 'Palatal ulcer in lupus', 'Oral ulcers · 2 pts', 'An erythematous, ulcerated area on the hard palate. Palatal lesions are often painless, so examine the mouth rather than relying on the patient to mention them.'],
+  ['lupus_oral_palate', 'Oral ulcers in lupus', 'Oral ulcers · 2 pts', 'Multiple ulcers on the hard palate and inside the cheek, with crusted lips, in a child with bullous lupus. In SLE, oral ulcers are classically painless and palatal, and count for 2 points when nothing else explains them.'],
+  ['dle_scalp_dark_skin', 'Discoid lupus of the scalp on black skin', 'Discoid · scarring alopecia', 'A depigmented, atrophic, scarring plaque with permanent hair loss. On darker skin, loss of pigment in the centre and darkening at the edge are common, and erythema is less obvious.'],
+  ['gottron', 'Gottron papules', 'Dermatomyositis', 'Violaceous papules and plaques over the knuckles and finger joints. Lupus rash on the hands usually spares the skin directly over the knuckles, so location helps tell them apart.'],
+  ['heliotrope_dark_skin', 'Heliotrope rash on darker skin', 'Dermatomyositis', 'Violet to dusky erythema with swelling of the upper eyelids. In darker skin (types III to VI) the heliotrope rash can be subtle and mistaken for inactive disease, so look for the periorbital swelling and violet hue.'],
+  ['dm_heliotrope_holster_gottron', 'Heliotrope, holster sign and Gottron papules', 'Dermatomyositis', 'A: violaceous eyelids (heliotrope sign). B: rash over the outer thighs (holster sign). C: papules over the knuckles (Gottron). This case was a paraneoplastic dermatomyositis: new dermatomyositis in an older adult prompts a cancer screen.'],
+  ['dm_tif1g', 'Heliotrope rash, V-sign and Gottron papules', 'Anti-TIF1γ', 'Periorbital violaceous erythema, a V-shaped chest rash and papules over the finger joints in a patient with anti-TIF1γ dermatomyositis, an antibody associated with cancer-related disease and severe skin involvement.'],
+  ['antisynthetase_heliotrope_mechanics', 'Heliotrope rash and mechanic’s hands', 'Antisynthetase', 'A: violaceous eyelids. B: hyperkeratotic, fissured skin along the sides of the fingers and the palms (mechanic’s hands), which goes with antisynthetase syndrome. Its antibodies, such as anti-PL-7 here, may be ANA-negative on IIF.'],
+  ['mechanics_hands_dark_skin', 'Mechanic’s hands on darker skin', 'Antisynthetase', 'Thickened, cracked skin along the sides of the fingers and on the palms, from a case series of antisynthetase syndrome in Gabon. Erythema is hard to see on darker skin, so look for scaling, fissuring and roughness.'],
+  ['dermatomyositis', 'Dermatomyositis hand', 'Dermatomyositis', 'Rash over the finger joints with periungual changes. Look for proximal weakness, a raised CK and the heliotrope eyelid rash; antibodies such as Jo-1 and MDA5 may be ANA-negative on IIF.'] ] },
+ { h: 'Raynaud, scleroderma and capillaries', p: 'Raynaud with a positive ANA and puffy fingers is the commonest route into very early systemic sclerosis. With a negative ANA and normal capillaroscopy, risk of systemic sclerosis is below about 2%.', items: [
+  ['raynaud', 'Raynaud: pallor phase', 'Biphasic or triphasic', 'Sharply demarcated white fingers during vasospasm, usually followed by blue and then red on rewarming. Primary Raynaud is symmetric, starts young, and has a normal nailfold and a negative ANA.'],
+  ['raynaud2', 'Raynaud: single digit', 'Vasospasm', 'A single blanched digit. Digital ulcers, pitting scars or gangrene are red flags that bypass the score.'],
+  ['nailfold', 'Nailfold capillaroscopy', 'Capillaries', 'Capillary loops are examined for enlargement, dropout and haemorrhages. An abnormal pattern markedly raises the chance that Raynaud will progress to systemic sclerosis.'],
+  ['ssc_fingers', 'Sclerodactyly', 'SSc · 4 pts', 'Tight, thickened, tapering fingers distal to the knuckles. Skin thickening proximal to the knuckles scores 9 points, enough to meet the classification criteria on its own.'],
+  ['ssc_puffy_hands', 'Puffy fingers', 'Early SSc · 2 pts', 'Diffuse swelling of the fingers and hands, often with redness, in early systemic sclerosis. Puffy fingers with Raynaud and a positive ANA is a very-early-SSc red flag.'],
+  ['ssc_hands_bilateral', 'Tight, shiny fingers on both hands', 'Sclerodactyly', 'Taut, shiny skin over the distal fingers. Changes in systemic sclerosis are symmetric, so involvement of only one hand points elsewhere.'],
+  ['ssc_face_hands', 'Mask-like face and digital sclerosis', 'SSc', 'A: tight facial skin with reduced wrinkles and radial furrows around the mouth (eyes masked for privacy). B: thickened, tight fingers with Raynaud-related colour change.'],
+  ['ssc_face_telangiectasia', 'Facial telangiectasias', 'SSc · 2 pts', 'Many red-purple macular telangiectasias across the cheeks, nose and forehead in diffuse systemic sclerosis (eyes masked). Telangiectasia scores 2 points in the classification criteria.'],
+  ['ssc_finger', 'Swollen, tight finger with ulcer', 'Systemic sclerosis', 'Swelling with tight skin and a digital ulcer. Puffy fingers are an early warning sign; ulcers mean vascular involvement.'],
+  ['calcinosis', 'Calcinosis (X-ray)', 'Limited SSc', 'Calcium deposits in the fingertips and soft tissue, part of the CREST picture: calcinosis, Raynaud, oesophageal dysmotility, sclerodactyly and telangiectasia.'] ] },
+ { h: 'Dry eyes and mouth', p: 'Dryness alone does not count: objective tests do. Dryness from SSRIs, anticholinergics or age scores zero. Anti-SSA/Ro is the key antibody, and it can be present when the IIF ANA is negative.', items: [
+  ['schirmer', 'Schirmer test (illustration)', 'Sjögren · 1 pt', 'A strip of filter paper hooked over the lower eyelid for five minutes. Wetting of 5 mm or less supports objective eye dryness and scores 1 point in the 2016 Sjögren criteria. This is a drawing, not a photograph; a parotid-swelling photo is still missing.'] ] },
+ { h: 'Joints', p: 'Inflammatory arthritis means swelling, warmth and tenderness in at least two joints, or tenderness plus stiffness of 30 minutes or more. Joint pain without any of these does not count.', items: [
+  ['knee_effusion', 'Knee effusion', 'Synovitis', 'Fullness above and beside the kneecap, compared with the other side. An effusion with warmth and stiffness points to inflammatory arthritis; check for other causes first.'],
+  ['power_doppler_synovitis', 'Power-Doppler ultrasound', 'Synovitis', 'Top: a swollen metacarpophalangeal joint with thickened synovium on grey scale and blood-flow signal on power Doppler. Bottom: flexor tenosynovitis. Doppler signal confirms active inflammation when the examination is unclear. From a patient with seronegative rheumatoid arthritis.'],
+  ['ra_hands', 'Long-standing deformity', 'Mimic', 'Ulnar drift and finger deformity from chronic inflammatory arthritis: damage, not active synovitis. Rheumatoid arthritis can itself be ANA-positive, so it is a frequent mimic of lupus joint disease.'] ] },
+ { h: 'Kidney: urine sediment', p: 'New proteinuria or an active sediment is a red flag. Cellular casts show active inflammation in the kidney. Red-cell casts are the classic sign of glomerulonephritis, including lupus nephritis; hyaline casts alone are non-specific.', items: [
+  ['urine_active_sediment', 'Active urinary sediment', 'Glomerular', 'Dysmorphic red cells (red arrows) and white cells in fresh urine, from a patient with crescentic glomerulonephritis. Dysmorphic red cells point to glomerular bleeding and, with proteinuria, to lupus nephritis in a patient with a positive ANA.'],
+  ['urine_dysmorphic_rbc', 'Types of dysmorphic red cells', 'Phase contrast ×400', 'Multilobulated, ring-shaped, spiculated and acanthocyte (G1) forms. Acanthocytes are the most specific sign of glomerular bleeding.'],
+  ['urine_epithelial_cast', 'Epithelial cell cast', 'Cellular cast', 'A cast built from tubular epithelial cells, seen with tubular injury, interstitial disease and some glomerular disease. Read it together with red cells and protein.'],
+  ['urine_wbc_cast', 'White-cell cast', 'Cellular cast', 'A cast containing white cells, typical of interstitial nephritis or pyelonephritis and also seen in some proliferative glomerulonephritis. A red-cell cast image is still missing.'] ] },
+];
+// multi-panel figures and unusual aspect ratios are shown whole instead of cropped
+const WHOLE = /^(hep2_|ana_main|dm_heliotrope|antisynthetase|ssc_face_hands|urine_dysmorphic|power_doppler|calcinosis)/;
+window.fitImg = (i, slug) => { const r = i.naturalWidth / i.naturalHeight; if (WHOLE.test(slug) || r < 1.1 || r > 1.6) { i.style.objectFit = 'contain'; i.parentElement.style.background = '#fff'; } };
+function figCard([slug, t, tag, d]) {
+  const c = CREDITS[slug]; if (!c) return '';
+  return `<article class="card fig"><button class="im" data-lb="${slug}" aria-label="Enlarge: ${esc(t)}"><img src="assets/edu/${c.file}" alt="${esc(t)}: ${esc(d.split('.')[0])}" loading="lazy" onload="fitImg(this,'${slug}')"></button>
+   <h4>${esc(t)}<span class="pill y"><i></i>${esc(tag)}</span></h4><p>${esc(d)}</p>
+   <div class="cr">${esc(c.author)} · <a href="${esc(c.licenceUrl || c.source)}" target="_blank" rel="noopener">${esc(c.licence)}</a> · <a href="${esc(c.source)}" target="_blank" rel="noopener">${esc(c.sourceLabel || 'Wikimedia Commons')}</a></div></article>`;
+}
+function eduRender() {
+  $('#view-edu').innerHTML = `<section class="card notice mt-2"><div class="card-h"><span class="ico">${ic('image')}</span><h3>About these images</h3></div>
+   <p class="meta" style="color:var(--ink)">Open-licensed teaching images from Wikimedia Commons and open-access journals, each credited below it. They illustrate typical findings; real presentations vary, and skin tone changes how rashes look. They are not for diagnosis. Tap an image to enlarge it.</p></section>` +
+   EDU.map((g) => `<h2 class="sec-h">${g.h}</h2><p class="sec-p">${g.p}</p><div class="figs">${g.items.map(figCard).join('')}</div>`).join('');
+}
+const lb = $('#lb');
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-lb]'); if (b) { const c = CREDITS[b.dataset.lb]; $('#lbImg').src = 'assets/edu/' + c.file; $('#lbImg').alt = b.getAttribute('aria-label'); $('#lbCap').innerHTML = `${esc(c.author)} · <a href="${esc(c.licenceUrl || c.source)}" target="_blank" rel="noopener">${esc(c.licence)}</a> · <a href="${esc(c.source)}" target="_blank" rel="noopener">${esc(c.sourceLabel || 'Wikimedia Commons')}</a>`; lb.showModal(); return; }
+  if (e.target === lb || e.target.closest('#lbX')) lb.close();
+});
+
+/* ---------- model & limits ---------- */
+function gradeCounts() {
+  const c = { A: 0, B: 0, C: 0, D: 0 }, add = (g) => { g = String(g); const k = g.includes('D') ? 'D' : g[0]; if (k in c) c[k]++; };
+  CFG.clinicalDomains.forEach((d) => d.items.forEach((i) => add(i.grade))); CFG.titerSpectrum.forEach((t) => add(t.grade));
+  CFG.icapPatterns.forEach((p) => p.lr != null && add(p.grade)); CFG.confounders.forEach((x) => add(x.grade)); CFG.assayCombos.forEach((x) => add(x.grade));
+  return c;
+}
+function evidRender() {
+  const T = CFG.titerSpectrum, P = CFG.engineParameters, th = P.thresholds, G = gradeCounts(), tot = G.A + G.B + G.C + G.D;
+  const card = (i, h, b, r = '', cls = '') => `<section class="card ${cls}"><div class="card-h"><span class="ico">${ic(i)}</span><h3>${h}</h3><span class="ml-auto">${r}</span></div>${b}</section>`;
+  const rows = T.map((t) => `<div class="lolli" style="grid-template-columns:62px 1fr 52px"><span class="meta">${t.std}</span><div class="rail"><div class="dot ${t.lr < 1 ? 'c' : ''}" style="left:${Math.min(98, Math.log10(t.lr * 20) / Math.log10(26 * 20) * 100)}%"></div></div><b class="font-medium text-[12px]">×${t.lr}</b></div>`).join('');
+  const LIM = [
+   ['Not validated on patients.', 'No part of this model has been tested against real ANA-positive patients with confirmed outcomes. Nothing here has been calibrated, so a displayed percentage can be wrong in either direction.'],
+   ['The pre-test score borrows classification weights.', 'Points come from the SLE, SSc and Sjögren classification criteria, which were built to classify research cohorts, not to diagnose or triage. Mapping score to probability (log-odds −4.18 + 0.48 per point) is an assumption, not a fitted model.'],
+   ['Many numbers are design assumptions.', `${G.D} of ${tot} graded values are grade D: opinion-based weights for non-SLE features, the pattern likelihood ratios, the confounder factors, the 1:160 titer LR and the tier cut-points (${Math.round(th.greenMaxPost * 100)}% / ${Math.round(th.yellowMaxPost * 100)}% / ${Math.round(th.expeditedMinPost * 100)}%).`],
+   ['Titer likelihood ratios are illustrative and lab-dependent.', 'They come from a few studies with different substrates, readers and endpoints (mostly SLE). Immunofluorescence varies a lot between laboratories. The 1:32 series is mapped to the standard series by rank only, with about one tier of uncertainty.'],
+   ['Pattern evidence is thin.', 'No published pattern-specific likelihood ratios exist, so pattern weights only encode an order (centromere above nucleolar above speckled above homogeneous). A report that only says “speckled” cannot be resolved into a code.'],
+   ['Evidence layers overlap.', 'Titer, pattern and specific antibodies are correlated. The model shrinks the pattern term and caps the combined LR at 26, but these are pragmatic limits, not measured dependence.'],
+   ['Outcome definitions are mixed.', 'Some inputs describe SLE, others any ANA-associated rheumatic disease, and prognosis over time is a separate question. They are combined here for usability, which blurs what the percentage means.'],
+   ['Narrow population.', 'Built for adults seen in general or primary care. It excludes established autoimmune disease, most pregnancy care and organ-specific autoimmune disease. Children use rules only, with no estimate, because pediatric evidence is mostly single-centre and retrospective.'],
+   ['Inputs that matter are missing.', 'It does not use symptom duration or trend, sex or ancestry beyond what is stated, most laboratory results, imaging, family history detail or the examiner’s overall impression. Missing data are treated as absent.'],
+   ['The red-flag list is not exhaustive.', 'No red flag selected does not mean safe. Clinical concern should always override the tool.'],
+   ['Illustrations are not diagnostic images.', 'The microscope view is a procedural drawing. The 3D figure is a simplified anatomy model with approximate marker positions. The photographs are examples only.'],
+   ['Evidence is a snapshot.', 'The evidence was compiled from three source documents and the literature they cite. It is not a living systematic review and may be out of date as soon as new data are published.'],
+   ['Regulatory status is unreviewed.', 'Software that informs clinical decisions may count as a medical device or clinical decision support under local regulations. This has not been assessed.'] ];
+  $('#view-evid').innerHTML = `
+   <section class="card notice mt-2"><div class="card-h"><span class="ico">${ic('shield')}</span><h3>Disclaimer</h3><span class="ml-auto pill y"><i></i>Read first</span></div>
+    <p style="margin:0 0 8px;font-size:15px;line-height:1.5">This is an educational decision-support prototype. It is <b class="font-semibold">not a diagnosis, not a medical device and not a substitute for clinical judgement</b>, and it has not been validated on patients.</p>
+    <p class="meta" style="color:var(--ink)">Do not use it to rule disease in or out, to delay referral when you are concerned, or for patients to assess themselves. Treat every percentage as an illustrative range. Nothing you enter is stored or sent anywhere; the page only requests fonts and code libraries from public CDNs.</p></section>
+   <div class="cols c2 mt-3">
+    ${card('check', 'Intended use', `<ul class="list note"><li>Teaching how titer, pattern and clinical picture combine.</li><li>Prompting a structured review of a positive ANA by a clinician.</li><li>Discussion and research: every number and its evidence grade is visible and editable.</li></ul>`)}
+    ${card('shield', 'Not intended for', `<ul class="list no"><li>Making or excluding a diagnosis.</li><li>Replacing specialist referral or urgent assessment.</li><li>Use by patients, or in children beyond the rule-only branch.</li><li>Medico-legal or reimbursement decisions.</li></ul>`)}
+   </div>
+   <h2 class="sec-h">Known limitations</h2>
+   <section class="card"><ol class="ol">${LIM.map(([h, t]) => `<li><div><b>${h}</b> <span class="meta" style="color:var(--ink2);font-size:13px">${t}</span></div></li>`).join('')}</ol></section>
+   <h2 class="sec-h">How the model works</h2>
+   <div class="cols c2">
+    ${card('list', 'Pipeline', `<ol class="ol"><li><div><b>Red flags first.</b> Any red flag means urgent assessment; nothing else is calculated.</div></li><li><div><b>Clinical score.</b> Highest weight per domain, summed. Fatigue or widespread pain alone scores −2.</div></li><li><div><b>Pre-test probability.</b> Logistic: log-odds = ${P.beta0LogOdds} + ${P.beta1SlopePerPoint} × score.</div></li><li><div><b>Likelihood ratios.</b> Titer × confounder factor × pattern<sup>${P.patternShrinkageAlpha}</sup>, capped at ${P.combinedLrCap}.</div></li><li><div><b>Post-test.</b> Pre-test odds × LR, shown as a range from the LR interval.</div></li><li><div><b>Tier by rules.</b> Cut-points ${Math.round(th.greenMaxPost * 100)}% / ${Math.round(th.yellowMaxPost * 100)}% / ${Math.round(th.expeditedMinPost * 100)}%, plus overrides for objective features, soft-reflex patterns, specific antibodies and abnormal labs.</div></li></ol>`)}
+    ${card('layers', 'Evidence grades in this model', `<div class="well">${[['A', 'Criteria weight', 'var(--ink)'], ['B', 'Published LR', 'var(--cobalt)'], ['C', 'Cohort / illustrative', 'var(--pink-2)'], ['D', 'Design assumption', 'var(--coral)']].map(([g, l, col]) => `<div class="lolli" style="grid-template-columns:100px 1fr 28px"><span class="meta">${g} · ${l}</span><div class="rail"><b style="width:${G[g] / tot * 100}%;background:${col}"></b></div><b class="font-medium text-[12px]">${G[g]}</b></div>`).join('')}</div><p class="meta mt-3">${tot} graded values: weights, titers, patterns that carry an LR, confounders and assay combinations.</p>`)}
+    ${card('act', 'Titer likelihood ratios', `<div class="well">${rows}</div><p class="meta mt-3">Interval LRs (exact band), not “at least” thresholds. An exact 1:80 lowers the odds of SLE slightly; the rise comes from 1:160 to 1:320.</p>`)}
+    ${card('flask', 'Healthy adults by titer', `<div class="well">${T.slice(1).map((t) => `<div class="lolli" style="grid-template-columns:62px 1fr 44px"><span class="meta">≥ ${t.std.replace('>=', '')}</span><div class="rail"><b style="width:${t.healthyCumulative * 100 * 2.8}%;background:#C3CBD5"></b></div><b class="font-medium text-[12px]">${pct(t.healthyCumulative)}</b></div>`).join('')}</div><p class="meta mt-3">Cumulative prevalence (Tan 1997; Racoubian 2016). Roughly double in women; about 19% at age 70+; 5–18% in children.</p>`)}
+   </div>
+   <h2 class="sec-h">Open source and licences</h2>
+   <section class="card"><p class="meta mb-2" style="color:var(--ink)">The tool is built to be read, checked and improved. The calculation engine, every weight and the build scripts are plain files, and each piece of third-party material keeps its own licence.</p>
+    <table class="tbl"><tbody>
+     <tr><td>Application code, engine, data files</td><td>MIT licence (file <code>LICENSE</code>): <code>engine.mjs</code>, <code>ana-engine-config.v2.json</code>, <code>cases.json</code>, <code>app.template.html</code>, <code>tools/</code></td></tr>
+     <tr><td>3D anatomy</td><td>Derived from <a href="https://dbarchive.biosciencedbc.jp/en/bodyparts3d/download.html" target="_blank" rel="noopener" style="text-decoration:underline">BodyParts3D</a>, © The Database Center for Life Science, CC BY-SA 2.1 Japan; simplified model shared under the same licence</td></tr>
+     <tr><td>Teaching photographs</td><td>Images from Wikimedia Commons and open-access journals under CC0, public domain, CC BY or CC BY-SA; the author and licence are printed under every image</td></tr>
+     <tr><td>Libraries and fonts</td><td>three.js (MIT), Tailwind CSS (MIT), Plus Jakarta Sans (SIL Open Font Licence)</td></tr>
+     <tr><td>Evidence</td><td>2019 EULAR/ACR SLE, 2013 ACR/EULAR SSc and 2016 ACR/EULAR Sjögren criteria; ICAP nomenclature; Bossuyt 2020; Leuchten 2018; Vulsteke 2021; Tan 1997; Conrad 2017 and others cited in the research report</td></tr>
+    </tbody></table></section>
+   <h2 class="sec-h">Before any clinical use</h2>
+   <section class="card"><ul class="list"><li>Review the grade D values with a rheumatologist and calibrate against local, adjudicated ANA-positive cohorts.</li><li>Test usability with primary care clinicians and monitor referral yield, missed organ-threatening disease and over-testing.</li><li>Check performance across sex, age, laboratory and setting, and review regulatory classification.</li></ul></section>`;
+}
+
+/* ---------- about ---------- */
+function aboutRender() {
+  $('#view-about').innerHTML = `<section class="card about mt-2"><img src="assets/about/ishita.jpg" alt="Portrait of Dr. Ishita Misurya in a white coat" width="200" height="200">
+   <div class="grid gap-3 content-center"><div><span class="pill y"><i></i>Hospitalist</span></div><h2>Ishita Misurya, MD</h2>
+   <p>Dr. Misurya trained in internal medicine at Saint Peter’s University Hospital in New Brunswick, New Jersey.</p>
+   <p>She is a member of the American College of Rheumatology, the Maryland Society for the Rheumatic Diseases and the Myositis Clinical Trials Consortium, where she works on outcome measures in inflammatory myopathies, especially inclusion body myositis. Her other interests are musculoskeletal point-of-care ultrasound, quality improvement and opioid stewardship.</p>
+   <p style="color:var(--ink)">Questions, corrections or ideas for this tool are welcome: <a href="mailto:ishitamisurya@gmail.com" style="text-decoration:underline">ishitamisurya@gmail.com</a></p></div></section>`;
+}
+
+/* ---------- boot ---------- */
+function all() { renderL(); renderDial(); renderR(); requestAnimationFrame(() => { drawHero(); place(); heroState(); }); }
+renderHS(); renderTabs(); rightShell(); all(); applyView();
+</script>
+<script>
+/* ---------- tutorial + Boba (rule-based, no network) ---------- */
+(() => {
+  const KQ = 'ana-boba-quiet', KT = 'ana-tour-v1';
+  const store = { get: (k) => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* private mode */ } } };
+  const chip = (t, on) => `<span class="chip ${on ? '' : ''}" ${on ? 'aria-pressed="true"' : ''} style="pointer-events:none">${t}</span>`;
+  const STEPS = [
+    { t: 'Welcome', p: 'A positive ANA is a probability modifier, not a diagnosis. This tool walks through the clinical picture, the titer and the pattern, then suggests a proportionate next step.',
+      note: 'Educational prototype: not validated, not a medical device. It supports clinical judgement and does not replace it.', art: () => `<img src="assets/boba.webp" alt="" width="110" height="110" style="image-rendering:pixelated">` },
+    { t: 'Safety comes first', p: 'New proteinuria, serositis, seizures, severe cytopenias, digital ischaemia or rapidly progressive weakness skip the maths. Select any red flag and the answer is same-day evaluation, whatever the titer.',
+      art: () => `<div class="big-ico">${ic('shield')}</div>` },
+    { t: 'Say what you see', p: 'Tap markers on the body map, or use the Clinical findings chips. Only objective findings that nothing else explains count, and each domain counts its highest item. Fatigue or widespread pain alone lowers the score.',
+      art: () => `<div class="row">${chip('Synovitis', 1)}${chip('Raynaud', 1)}${chip('Malar rash')}${chip('Proteinuria')}</div>` },
+    { t: 'Enter the ANA result', p: 'Pick the lab’s method, the dilution series (1:40 or 1:32) and the titer tube. Then set the pattern with the dial or the microscope view. If the lab only says “speckled”, ask for the ICAP code.',
+      art: () => `<div class="mini-tubes">${[18, 30, 42, 56, 68, 80, 92].map((f, i) => `<i class="${i === 2 ? 'sel' : ''}" style="height:${60 + i * 4}px;--f:${f}%;--c:${i < 2 ? 'var(--pink-1)' : i < 4 ? 'var(--pink-2)' : 'var(--coral)'}"></i>`).join('')}</div>` },
+    { t: 'Read the result', p: 'The gauge shows a range, not a verdict. The tier comes from rules: reassure, targeted work-up, or refer. Next steps list what to order, what to avoid and what to tell the patient, and one tap copies a referral summary.',
+      art: () => `<svg viewBox="0 0 240 130" width="200" aria-hidden="true">${Array.from({ length: 30 }, (_, i) => { const a = Math.PI * (1 - i / 29), c = Math.cos(a), sn = Math.sin(a); return `<line x1="${120 + 76 * c}" y1="${120 - 76 * sn}" x2="${120 + 100 * c}" y2="${120 - 100 * sn}" stroke="${i < 11 ? colAt(Math.round(i * 39 / 29)) : '#E3E8EE'}" stroke-width="6" stroke-linecap="round"/>`; }).join('')}<text x="120" y="112" text-anchor="middle" font-size="30" font-weight="500" fill="#111418">12%</text></svg>` },
+    { t: 'Practise and learn', p: 'The Triage Challenge has nine vignettes with scoring. Education has real microscope slides and clinical photos. Model & limits explains every assumption. Boba, bottom right, can explain your result or replay this tutorial.',
+      art: () => `<div class="row">${chip('Triage Challenge', 1)}${chip('Education')}${chip('Model & limits')}</div>` },
+  ];
+  const dlg = $('#tour'); let i = 0;
+  function tourRender() {
+    const s = STEPS[i], last = i === STEPS.length - 1;
+    dlg.innerHTML = `<div class="tour-in"><div class="tour-top"><div class="dots" aria-label="Step ${i + 1} of ${STEPS.length}">${STEPS.map((_, j) => `<i class="${j === i ? 'on' : ''}"></i>`).join('')}</div><button class="link meta" id="tSkip">${last ? '' : 'Skip'}</button></div>
+     <div class="tour-art">${s.art()}</div><div><h2 id="tourT">${s.t}</h2></div><p>${s.p}</p>${s.note ? `<p class="note">${s.note}</p>` : ''}
+     <div class="tour-foot">${i ? '<button class="ghost" id="tBack">Back</button>' : ''}<button class="cta" id="tNext"><span>${i === 0 ? 'Start tutorial' : last ? 'Got it' : 'Next'}</span><span class="go">${ic(last ? 'check' : 'arrow')}</span></button></div></div>`;
+    $('#tNext').onclick = () => (last ? dlg.close() : (i++, tourRender())); $('#tBack') && ($('#tBack').onclick = () => (i--, tourRender())); $('#tSkip').onclick = () => dlg.close();
+    $('#tNext').focus();
+  }
+  window.startTour = () => { i = 0; tourRender(); if (!dlg.open) dlg.showModal(); };
+  dlg.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight' && i < STEPS.length - 1) { i++; tourRender(); } if (e.key === 'ArrowLeft' && i > 0) { i--; tourRender(); } });
+  dlg.addEventListener('close', () => { store.set(KT, '1'); document.dispatchEvent(new Event('tour-closed')); });
+  $('#replayTour').onclick = window.startTour;
+
+  /* ---------- Boba ---------- */
+  const GENERAL = [
+    'About 1 in 7 healthy adults has an ANA of 1:80 or more, and about 1 in 3 at 1:40.',
+    'ANA titers do not track disease activity. Do not repeat the ANA to monitor lupus.',
+    'More than 90% of ANA-positive people never develop an autoimmune rheumatic disease.',
+    'About 8–11% of people with fibromyalgia are ANA-positive, similar to the background rate.',
+    'A negative IIF ANA does not exclude Sjögren’s or antisynthetase syndrome: anti-Ro and Jo-1 can be missed.',
+    'Isolated anti-DFS70 appears in 2–22% of healthy people and in under 1% of autoimmune rheumatic disease.',
+    'Women have roughly double the healthy ANA prevalence, and it climbs with age to about 19% after 70.',
+    'The 10-point SLE threshold classifies research cohorts. It is not a diagnosis.',
+    'In children, a positive ANA usually matters only from about 1:640 upward.',
+  ];
+  const PETS = ['Woof!', 'That is the spot.', 'More pets, please.', 'I could get used to this.', 'Good human.'];
+  const TAB_HELP = {
+    calc: 'This is the calculator. Tell it the findings (body map or chips), the titer and pattern, and read the tier and next steps on the right.',
+    chal: 'Triage Challenge: nine short cases. Choose Dismiss, Order targeted work-up or Refer, and see the evidence-based answer and what it cost.',
+    edu: 'Education: real microscope slides and clinical photos with teaching notes. Tap an image to enlarge it; credits are underneath.',
+    evid: 'Model & limits: the disclaimer, every known limitation, how the numbers are built and the licences.',
+    about: 'About the author, with a way to contact her.',
+  };
+  const RULES = [
+    { id: 'red', cool: 60e3, when: (c) => c.S.red.size > 0, text: () => 'A red flag overrides titer and pattern. That means same-day evaluation and urgent rheumatology input, not a work-up on paper.' },
+    { id: 'fatigue', cool: 1e12, when: (c) => c.S.sym.size === 1 && c.S.sym.has('nonspecific_only'), text: () => 'Fatigue and diffuse aches alone score minus 2 and are not an indication to test. That is the classic low-value ANA.' },
+    { id: 'first', cool: 1e12, when: (c) => c.S.sym.size >= 1 && !c.S.sym.has('nonspecific_only'), text: () => 'Each domain counts only its highest finding, and only if nothing else explains it. Add what you see and I will keep the score.' },
+    { id: 't40', cool: 1e12, when: (c) => c.S.method === 'iif' && c.S.titer === 1, text: () => '1:40 shows up in about 1 in 3 healthy adults, so it barely moves the odds.' },
+    { id: 't80', cool: 1e12, when: (c) => c.S.method === 'iif' && c.S.titer === 2, text: () => 'An exact 1:80 is common in healthy adults (about 1 in 7) and slightly lowers the odds of SLE. The real rise comes between 1:160 and 1:320.' },
+    { id: 'high-quiet', cool: 1e12, when: (c) => c.S.method === 'iif' && c.S.titer >= 5 && c.res?.r.numeric && c.res.r.score <= 0, text: () => 'A very high titer with no findings still gives a modest probability. Ask why it was ordered and take a careful history.' },
+    { id: 'legacy', cool: 1e12, when: (c) => c.S.legacy && c.S.method === 'iif', text: () => 'The 1:32 series is mapped to the standard series by rank, so treat the tier as approximate: about one tier of uncertainty.' },
+    { id: 'sp', cool: 1e12, when: (c) => c.S.method === 'sp', text: () => 'Solid-phase assays give no titer or pattern. If IIF is available, ask for the titer and ICAP code: they carry information.' },
+    { id: 'peds', cool: 1e12, when: (c) => c.S.peds, text: () => 'Child mode uses rules only: no estimate and no DFS70 rule-out. In a well child, a titer below 1:640 can usually be disregarded.' },
+    { id: 'ac2', cool: 1e12, when: (c) => c.S.method === 'iif' && c.S.pattern === 'AC-2' && !c.S.dfs, text: () => 'Dense fine speckled: confirm monospecific anti-DFS70 before reassuring anyone. About half of labs mis-call this pattern.' },
+    { id: 'ac3', cool: 1e12, when: (c) => c.S.method === 'iif' && c.S.pattern === 'AC-3', text: () => 'Centromere: check ALP and AMA as well as Raynaud and sicca. In a large cohort, primary biliary cholangitis and Sjögren’s outnumbered scleroderma.' },
+    { id: 'ac19', cool: 1e12, when: (c) => c.S.method === 'iif' && c.S.pattern === 'AC-19_20', text: () => 'Cytoplasmic speckled can hide behind a “negative” nuclear screen. Think antisynthetase syndrome with weakness, lung disease or mechanic’s hands.' },
+    { id: 'scope', cool: 1e12, when: (c) => c.S.method === 'iif' && c.S.pattern !== 'UNSPEC', text: () => 'Look at the dividing cells. A dark chromosome plate points to fine or coarse speckled; a stained plate to homogeneous or DFS70.' },
+    { id: 'green', cool: 90e3, when: (c) => c.touched && c.res?.r.tier === 'GREEN', text: () => 'Reassure and stop. A positive ANA with no objective findings does not need ENA, a repeat ANA or a referral. Give the safety-net advice.' },
+    { id: 'yellow', cool: 90e3, when: (c) => c.touched && c.res?.r.tier === 'YELLOW', text: () => 'Targeted, not shotgun: order only what the pattern and findings point to, and refer if anything comes back abnormal.' },
+    { id: 'red-tier', cool: 90e3, when: (c) => c.touched && /^RED/.test(c.res?.r.tier || ''), text: () => 'This one deserves a specialist. Send the baseline labs with the referral; Copy referral summary does the paperwork.' },
+    { id: 'tab-chal', cool: 1e12, when: (c) => c.tab === 'chal', text: () => 'Restraint is rewarded here. Dismissing a benign case is a perfectly correct answer.' },
+    { id: 'tab-edu', cool: 1e12, when: (c) => c.tab === 'edu', text: () => 'Tap any image to enlarge it. The author and licence sit under each one. If you can find a missing image, send it to my human.' },
+    { id: 'tab-evid', cool: 1e12, when: (c) => c.tab === 'evid', text: () => 'Please read the limitations. I am a dog, not a validated diagnostic device.' },
+  ];
+
+  let quiet = store.get(KQ) === '1', asleep = false, pets = 0, g = 0, lastActive = Date.now(), lastAuto = 0, hideTimer = null, touched = false, sig = null;
+  const lastSaid = {};
+  const root = document.createElement('div'); root.className = 'boba';
+  root.innerHTML = `<div class="boba-bubble" role="status" aria-live="polite" hidden><button class="boba-x" aria-label="Close">×</button><p class="boba-name">Boba</p><p class="boba-text"></p><div class="boba-btns"></div></div>
+    <button class="boba-dog" aria-label="Boba, the assistant dog. Press for help." title="Click me. Double click for zoomies."><img src="assets/boba.webp" alt="" width="120" height="120" draggable="false"><span class="boba-zzz" aria-hidden="true">z z z</span></button>`;
+  document.body.append(root);
+  const bubble = $('.boba-bubble', root), text = $('.boba-text', root), btns = $('.boba-btns', root), dog = $('.boba-dog', root);
+  const anim = (cls, ms) => { dog.classList.remove('wag', 'hop', 'zoom'); void dog.offsetWidth; dog.classList.add(cls); setTimeout(() => dog.classList.remove(cls), ms); };
+  const close = () => { bubble.hidden = true; clearTimeout(hideTimer); };
+  function say(msg, choices = menu(), autoHide = 0) {
+    text.textContent = msg; btns.replaceChildren();
+    for (const [label, fn] of choices) { const b = document.createElement('button'); b.textContent = label; b.onclick = (e) => { e.stopPropagation(); fn(); }; btns.append(b); }
+    bubble.hidden = false; anim('wag', 900); clearTimeout(hideTimer); if (autoHide) hideTimer = setTimeout(close, autoHide);
+  }
+  const menu = () => [['Explain my result', explain], ['Teach me something', teach], ['What is on this tab?', () => say(TAB_HELP[S.tab])], ['Replay tutorial', () => { close(); window.startTour(); }], [quiet ? 'Unmute' : 'Hush', toggleQuiet]];
+  const teach = () => say(GENERAL[g++ % GENERAL.length], [['Another one', teach], ['Back', () => say('What can I help with?')]]);
+  function explain() {
+    const R = window._res; if (S.tab !== 'calc' || !R) return say('Open the Calculator tab, enter a few findings and a titer, and I will explain what the tool is doing.', [['Take me there', () => { S.tab = 'calc'; renderTabs(); close(); }]]);
+    const { r, lo, hi } = R, T = TIER[r.tier], tl = CFG.titerSpectrum[S.titer];
+    let m = `${T.head}.\n`;
+    if (r.tier === 'URGENT') m += 'You selected a red flag, so titer and pattern are ignored and no estimate is calculated.';
+    else if (!r.numeric) m += 'Child mode uses rules only, so there is no numeric estimate.';
+    else {
+      m += `Clinical score ${r.score} gives a pre-test probability of ${pct(r.pre)}. ` + (S.method === 'iif' ? `The titer ${S.legacy ? tl.legacy32 : tl.std} multiplies the odds by ${r.lrT}` : `The assay combination multiplies the odds by ${r.lrT}`) +
+        `${r.cf < 1 ? `, damped ×${r.cf} for a confounder` : ''}${r.lrP !== 1 ? `, and the pattern adds ×${r.lrP.toFixed(1)}` : ''}. Post-test: about ${pct(r.post)} (likely ${rng(lo.post, hi.post)}).`;
+    }
+    const unc = []; if (S.method === 'iif' && S.pattern === 'UNSPEC') unc.push('the pattern is not reported'); if (!S.sym.size && !S.red.size) unc.push('no findings entered'); if (S.legacy) unc.push('the 1:32 series is approximate');
+    m += `\nUncertain: ${unc.length ? unc.join('; ') : 'the weights are design assumptions (grade D) and not validated on patients'}.`;
+    say(m, [['Teach me something', teach], ['Back', () => say('What can I help with?')]]);
+  }
+  function toggleQuiet() { quiet = !quiet; store.set(KQ, quiet ? '1' : '0'); say(quiet ? 'Okay, I will stay quiet. Click me any time.' : 'Yay! I will chime in as you work.', menu(), 4000); }
+
+  dog.addEventListener('click', () => {
+    lastActive = Date.now();
+    if (asleep) { asleep = false; dog.classList.remove('nap'); return say('Woof! I am awake. What can I help with?'); }
+    if (!bubble.hidden) return close();
+    pets++; anim('hop', 500); say(pets > 1 && pets % 3 === 0 ? PETS[(pets / 3) % PETS.length] : 'What can I help with?');
+  });
+  dog.addEventListener('dblclick', () => { anim('zoom', 1400); say('Zoomies!', [], 2500); });
+  $('.boba-x', root).onclick = close;
+  for (const ev of ['scroll', 'pointerdown', 'keydown']) addEventListener(ev, () => { lastActive = Date.now(); }, { passive: true });
+
+  // context rules: poll a snapshot of the app state, speak the first eligible rule
+  const snap = () => JSON.stringify([S.tab, S.view, S.method, S.titer, S.combo, S.legacy, S.pattern, [...S.sym], [...S.red], [...S.conf], S.peds, S.ab, S.labs, S.dfs]);
+  setInterval(() => {
+    const now = Date.now(), s = snap();
+    if (sig === null) { sig = s; return; }
+    if (s === sig) return; sig = s; touched = touched || S.tab === 'calc';
+    if (quiet || asleep || !bubble.hidden || dlg.open || now - lastAuto < 12e3) return;
+    const ctx = { S, res: window._res, tab: S.tab, touched };
+    const rule = RULES.find((r) => r.when(ctx) && now - (lastSaid[r.id] ?? -1e13) > r.cool);
+    if (rule) { lastSaid[rule.id] = now; lastAuto = now; say(rule.text(ctx), menu(), 12000); }
+  }, 900);
+  setInterval(() => {
+    if (!asleep && Date.now() - lastActive > 180e3) { asleep = true; close(); dog.classList.add('nap'); return; }
+    if (!asleep && bubble.hidden && Math.random() < 0.15) anim(Math.random() < 0.6 ? 'wag' : 'hop', 900);
+  }, 5000);
+
+  const greet = () => { if (!quiet) say('Hi, I am Boba! Tap me any time: I can explain your result, teach you a fact, or replay the tutorial.', menu(), 12000); };
+  if (store.get(KT)) setTimeout(greet, 2200);
+  else { setTimeout(window.startTour, 700); document.addEventListener('tour-closed', () => setTimeout(greet, 900), { once: true }); }
+})();
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+const box = document.getElementById('bodyBox'), cv = document.getElementById('bc'), note = document.getElementById('bodyNote');
+const MAT = { skin: [0xf0cfc2, .17], skeleton: [0xece6d6, 1], muscles: [0xc4574f, .66], lungs: [0xe8a1aa, .9], kidneys: [0xa8443f, 1], heart: [0xd9534f, 1], liver: [0x9a5545, .9] };
+const GROUP = { skin: ['skin'], muscles: ['muscles'], skeleton: ['skeleton'], organs: ['lungs', 'kidneys', 'heart', 'liver'] };
+const ORDER = { skeleton: 0, lungs: 1, kidneys: 1, heart: 1, liver: 1, muscles: 2, skin: 3 };
+let R, scene, cam, group, anchors = {}, parts = {}, glows = [], yaw = 0, zoom = 1, zt = 1, raf = 0, ready = false, started = false, hsEls = [];
+const V = THREE.Vector3, CAM_BASE = 4.5;
+
+function fail(msg) { note.hidden = false; note.textContent = msg; setTimeout(() => window.bodyFailed?.(), 900); }
+async function init() {
+  try { R = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, powerPreference: 'low-power' }); } catch { return fail('3D is not available on this device. Showing the microscope view.'); }
+  R.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); R.outputColorSpace = THREE.SRGBColorSpace;
+  scene = new THREE.Scene(); cam = new THREE.PerspectiveCamera(28, .8, .1, 30);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xb9c5d8, 1.25));
+  const key = new THREE.DirectionalLight(0xffffff, 1.7); key.position.set(1.6, 2.6, 3); scene.add(key);
+  const rim = new THREE.DirectionalLight(0xcfe0ff, .9); rim.position.set(-2, 1.2, -2.5); scene.add(rim);
+  group = new THREE.Group(); scene.add(group);
+  try {
+    const g = await new GLTFLoader().loadAsync('assets/anatomy.glb');
+    for (const n of Object.keys(MAT)) {
+      const m = g.scene.getObjectByName(n); if (!m) continue;
+      const [c, o] = MAT[n]; m.material = new THREE.MeshStandardMaterial({ color: c, roughness: .6, metalness: 0, transparent: o < 1, opacity: o, depthWrite: o >= .9 });
+      m.renderOrder = ORDER[n]; parts[n] = m; group.add(m);
+    }
+    const a = g.scene.userData.anchors || g.parser.json.scenes[0].extras.anchors;
+    for (const [k, v] of Object.entries(a)) anchors[k] = new V(...v);
+    anchors.eyes = new V().addVectors(anchors.rEye, anchors.lEye).multiplyScalar(.5); anchors.chin = anchors.mandible;
+  } catch (e) { console.error(e); return fail('Could not load the 3D model. Showing the microscope view.'); }
+  const gm = new THREE.SphereGeometry(.05, 16, 12);
+  window.HS.forEach((h) => { const m = new THREE.Mesh(gm, new THREE.MeshBasicMaterial({ color: 0xe5484d, transparent: true, opacity: .35, depthTest: false })); m.renderOrder = 9; m.visible = false; group.add(m); glows.push(m); });
+  note.hidden = true; ready = true; layers(); resize(); new ResizeObserver(resize).observe(box); frame();
+}
+function layers() { for (const [k, ns] of Object.entries(GROUP)) ns.forEach((n) => parts[n] && (parts[n].visible = S.layers[k])); }
+function resize() { const w = box.clientWidth, h = box.clientHeight; if (!w || !h || !R) return; R.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+const tmp = new V(), nrm = new V(), toCam = new V();
+function frame(t = 0) {
+  raf = 0; if (!ready || S.tab !== 'calc') { started = false; return; }
+  zoom += (zt - zoom) * .14;
+  const ty = .9, d = (innerWidth < 640 ? 4.0 : CAM_BASE) / zoom;
+  cam.position.set(0, ty + .08, d); cam.lookAt(0, ty, 0); group.rotation.y = yaw; group.updateMatrixWorld(true);
+  const w = box.clientWidth, h = box.clientHeight, pulse = 1 + .12 * Math.sin(t / 380);
+  const pts = [];
+  window.HS.forEach((hs, i) => {
+    const p = anchors[hs.a]; if (!p) return;
+    tmp.set(p.x + hs.d[0], p.y + hs.d[1], p.z + hs.d[2]);
+    glows[i].position.copy(tmp); glows[i].visible = hs.opts.some((id) => S.sym.has(id)); glows[i].scale.setScalar(pulse);
+    const world = tmp.clone().applyMatrix4(group.matrixWorld).project(cam);
+    nrm.set(...hs.n).applyQuaternion(group.quaternion); toCam.set(0, 0, 1);
+    const vis = Math.max(0, Math.min(1, (nrm.dot(toCam) - .05) / .35));
+    pts.push({ i, x: ((world.x + 1) / 2) * w, y: ((1 - world.y) / 2) * h, vis, side: hs.side });
+  });
+  layoutHS(pts, w, h);
+  R.render(scene, cam); raf = requestAnimationFrame(frame);
+}
+// markers follow the body (nudged apart if they collide); each label searches for a free spot so nothing overlaps
+const mk = [], lb = [], OFFS = [0]; for (let k = 1; k <= 18; k++) OFFS.push(14 * k, -14 * k);
+const hitR = (a, b) => !(a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y);
+function layoutHS(pts, w, h) {
+  const lines = document.getElementById('hsLines'), pos = (window.HSPOS ||= []), hsBox = document.getElementById('hs').getBoundingClientRect();
+  const act = [];
+  for (const p of pts) {
+    const m = (mk[p.i] ||= document.querySelector(`.hsd[data-hs="${p.i}"]`)), l = (lb[p.i] ||= document.querySelector(`.hsl[data-hs="${p.i}"]`)); if (!m || !l) continue;
+    p.m = m; p.l = l; p.r = m.offsetWidth / 2 || 12;
+    if (p.x < -8 || p.x > w + 8 || p.y < -8 || p.y > h + 8) p.vis = 0;
+    if (p.vis > .2) act.push(p);
+  }
+  for (let it = 0; it < 5; it++) for (let a = 0; a < act.length; a++) for (let b = a + 1; b < act.length; b++) {
+    const A = act[a], B = act[b], dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy) || .01, min = A.r + B.r + 5;
+    if (d < min) { const k = (min - d) / 2, ux = d < .1 ? 1 : dx / d, uy = d < .1 ? 0 : dy / d; A.x -= ux * k; A.y -= uy * k; B.x += ux * k; B.y += uy * k; }
+  }
+  const obst = [];
+  for (const p of pts) {
+    if (!p.m) continue;
+    pos[p.i] = { x: p.x, y: p.y };
+    p.m.style.transform = `translate(${p.x - p.r}px,${p.y - p.r}px)`; p.m.style.opacity = p.vis; p.m.style.pointerEvents = p.vis > .4 ? 'auto' : 'none';
+    p.w = p.l.offsetWidth; p.lh = p.l.offsetHeight || 30;
+    if (p.vis > .15) obst.push({ x: p.x - p.r - 2, y: p.y - p.r - 2, w: 2 * p.r + 4, h: 2 * p.r + 4, own: p.i });
+  }
+  const placed = []; let svg = '';
+  for (const p of pts.filter((q) => q.m).sort((a, b) => a.y - b.y)) {
+    if (p.vis < .15 || !p.w) { p.l.style.opacity = 0; p.l.style.pointerEvents = 'none'; continue; }
+    const near = Math.abs(p.x - w / 2) < 14, order = near ? [p.side, p.side === 'l' ? 'r' : 'l'] : p.x < w / 2 ? ['l', 'r'] : ['r', 'l'];
+    let best = null, bestScore = 1e9;
+    order.forEach((side, si) => {
+      const lx = side === 'l' ? p.x - p.r - 10 - p.w : p.x + p.r + 10;
+      for (const dy of OFFS) {
+        const ly = Math.min(h - p.lh / 2 - 4, Math.max(p.lh / 2 + 4, p.y + dy)), rect = { x: lx, y: ly - p.lh / 2, w: p.w, h: p.lh };
+        let c = (lx < 2 || lx + p.w > w - 2) ? 3 : 0;
+        for (const o of obst) if (hitR(rect, o)) c++;
+        for (const o of placed) if (hitR(rect, o)) c++;
+        const score = c * 1000 + Math.abs(ly - p.y) + si * 25;
+        if (score < bestScore) { bestScore = score; best = { side, lx, ly }; }
+        if (c === 0) break;
+      }
+    });
+    const { side, lx, ly } = best; placed.push({ x: lx, y: ly - p.lh / 2, w: p.w, h: p.lh });
+    p.l.style.transform = `translate(${lx}px,${ly}px) translateY(-50%)`; p.l.style.opacity = p.vis; p.l.style.pointerEvents = p.vis > .4 ? 'auto' : 'none';
+    if (Math.abs(ly - p.y) > 8) svg += `<path d="M${p.x} ${p.y} L${side === 'l' ? lx + p.w : lx} ${ly}" stroke="#9AA4AF" stroke-width="1" fill="none" opacity="${p.vis}"/>`;
+  }
+  lines.innerHTML = svg;
+}
+window.Body && 0;
+function start() { if (!started && ready) { started = true; resize(); raf = requestAnimationFrame(frame); } }
+cv.addEventListener('pointerdown', () => window.closePop?.());
+window.Body = {
+  start, layers,
+  snapshot: () => { // small white-background JPEG for the PDF
+    if (!ready) return null; R.render(scene, cam); const w = 360, h = Math.round(w * cv.height / cv.width), c = document.createElement('canvas'); c.width = w; c.height = h;
+    const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, w, h); x.drawImage(cv, 0, 0, w, h); return { url: c.toDataURL('image/jpeg', .85), w, h }; },
+};
+window.HS = window.HS || HS;
+init().then(() => { if (ready) start(); });
+</script>
+</body>
+</html>

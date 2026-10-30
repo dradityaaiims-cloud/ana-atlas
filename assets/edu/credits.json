@@ -1,0 +1,406 @@
+{
+ "ana_main_patterns": {
+  "file": "ana_main_patterns.png",
+  "title": "Main antinuclear antibody patterns on immunofluorescence.png",
+  "author": "Al-Mughales JA. Minor edits by Mikael Häggström, M.D.",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Main_antinuclear_antibody_patterns_on_immunofluorescence.png"
+ },
+ "ana_speckled_hep2": {
+  "file": "ana_speckled_hep2.jpg",
+  "title": "SPECKLED.jpg",
+  "author": "Simon Caulton",
+  "licence": "CC BY-SA 3.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:SPECKLED.jpg"
+ },
+ "ana_centromere": {
+  "file": "ana_centromere.jpg",
+  "title": "CENTROMERE.jpg",
+  "author": "Simon Caulton",
+  "licence": "CC BY-SA 3.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:CENTROMERE.jpg"
+ },
+ "ana_nucleolar": {
+  "file": "ana_nucleolar.jpg",
+  "title": "ANA NUCLEOLAR.jpg",
+  "author": "Simon Caulton",
+  "licence": "CC BY-SA 3.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:ANA_NUCLEOLAR.jpg"
+ },
+ "ana_dots_nucleolar": {
+  "file": "ana_dots_nucleolar.jpg",
+  "title": "ANA NUCLEAR DOTS AND NUCLEOLAR.jpg",
+  "author": "Simon Caulton",
+  "licence": "CC BY-SA 3.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:ANA_NUCLEAR_DOTS_AND_NUCLEOLAR.jpg"
+ },
+ "ana_homogeneous_liver": {
+  "file": "ana_homogeneous_liver.jpg",
+  "title": "ANA HOMOGENOUS DNA ABS LIVER.jpg",
+  "author": "Simon Caulton",
+  "licence": "CC BY-SA 3.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:ANA_HOMOGENOUS_DNA_ABS_LIVER.jpg"
+ },
+ "ana_speckled_liver": {
+  "file": "ana_speckled_liver.jpg",
+  "title": "ANA SPECKLED LIVER.jpg",
+  "author": "Simon Caulton",
+  "licence": "CC BY-SA 3.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:ANA_SPECKLED_LIVER.jpg"
+ },
+ "ana_negative_liver": {
+  "file": "ana_negative_liver.jpg",
+  "title": "ANA NEGATIVE LIVER.jpg",
+  "author": "Simon Caulton",
+  "licence": "CC BY-SA 3.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:ANA_NEGATIVE_LIVER.jpg"
+ },
+ "ana_dot_ama": {
+  "file": "ana_dot_ama.jpg",
+  "title": "ANA NUCLEAR DOT AND AMA.jpg",
+  "author": "Simon Caulton",
+  "licence": "CC BY-SA 3.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:ANA_NUCLEAR_DOT_AND_AMA.jpg"
+ },
+ "malar_rash": {
+  "file": "malar_rash.jpg",
+  "title": "Butterfly rash of lupus erythematosus.jpg",
+  "author": "CNX OpenStax",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Butterfly_rash_of_lupus_erythematosus.jpg"
+ },
+ "scle": {
+  "file": "scle.jpg",
+  "title": "Subacute cutaneous lupus erythematosus.jpg",
+  "author": "Successful treatment of refractory subacute cutaneous lupus erythematosus with deucravacitinib Bouché et al.",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Subacute_cutaneous_lupus_erythematosus.jpg"
+ },
+ "discoid": {
+  "file": "discoid.jpg",
+  "title": "Discoid lupus erythematosus.JPG",
+  "author": "Leonard C. Sperling, M.D., COL, MC, USA, Department of Dermatology, Uniformed Services University",
+  "licence": "Public domain",
+  "licenceUrl": "",
+  "source": "https://commons.wikimedia.org/wiki/File:Discoid_lupus_erythematosus.JPG"
+ },
+ "raynaud": {
+  "file": "raynaud.jpg",
+  "title": "Mains atteintes du syndrome de Raynaud en phase blanche.jpg",
+  "author": "Banane.c.l",
+  "licence": "CC0",
+  "licenceUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+  "source": "https://commons.wikimedia.org/wiki/File:Mains_atteintes_du_syndrome_de_Raynaud_en_phase_blanche.jpg"
+ },
+ "raynaud2": {
+  "file": "raynaud2.jpg",
+  "title": "Raynaud's Phenomenon (front).jpg",
+  "author": "Thomas Galvin",
+  "licence": "CC BY-SA 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Raynaud%27s_Phenomenon_(front).jpg"
+ },
+ "ssc_finger": {
+  "file": "ssc_finger.jpg",
+  "title": "Systemic sclerosis finger.jpg",
+  "author": "Frank Breuckmann, Thilo Gambichler, Peter Altmeyer and Alexander Kreuter",
+  "licence": "CC BY 2.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Systemic_sclerosis_finger.jpg"
+ },
+ "ssc_fingers": {
+  "file": "ssc_fingers.jpg",
+  "title": "Systemic sclerosis, fingers.jpg",
+  "author": "Maria Sieglinda von Nudeldorf",
+  "licence": "CC BY-SA 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Systemic_sclerosis,_fingers.jpg"
+ },
+ "calcinosis": {
+  "file": "calcinosis.jpg",
+  "title": "Calcinosis of CREST syndrome.jpg",
+  "author": "Mikael Häggström, M.D.",
+  "licence": "CC0",
+  "licenceUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+  "source": "https://commons.wikimedia.org/wiki/File:Calcinosis_of_CREST_syndrome.jpg"
+ },
+ "gottron": {
+  "file": "gottron.jpg",
+  "title": "Gottron papules .dermatomyocitis.jpg",
+  "author": "Mohammad2018",
+  "licence": "CC BY-SA 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Gottron_papules_.dermatomyocitis.jpg"
+ },
+ "dermatomyositis": {
+  "file": "dermatomyositis.jpg",
+  "title": "Dermatomyositis.jpg",
+  "author": "Elizabeth M. Dugan, Adam M. Huber, Frederick W. Miller, Lisa G. Rider",
+  "licence": "CC BY-SA 3.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Dermatomyositis.jpg"
+ },
+ "ra_hands": {
+  "file": "ra_hands.jpg",
+  "title": "Rheumatoid Arthritis.JPG",
+  "author": "James Heilman, MD",
+  "licence": "CC BY-SA 3.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Rheumatoid_Arthritis.JPG"
+ },
+ "knee_effusion": {
+  "file": "knee_effusion.jpg",
+  "title": "Kneeffusion.JPG",
+  "author": "James Heilman, MD",
+  "licence": "CC BY-SA 3.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Kneeffusion.JPG"
+ },
+ "nailfold": {
+  "file": "nailfold.png",
+  "title": "Nailfold Capillaries.png",
+  "author": "Dmitry Stavtsev, Nikita Margaryants, Mikhail Volkov",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Nailfold_Capillaries.png"
+ },
+ "rosacea": {
+  "file": "rosacea.jpg",
+  "title": "Rosacea 01.jpg",
+  "author": "M. Sand, D. Sand, C. Thrandorf, V. Paech, P. Altmeyer, F. G. Bechara",
+  "licence": "CC BY 2.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Rosacea_01.jpg"
+ },
+ "schirmer": {
+  "file": "schirmer.jpg",
+  "title": "Schirmer test.JPG",
+  "author": "User:Milorad Dimic MD",
+  "licence": "CC BY-SA 3.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Schirmer_test.JPG"
+ },
+ "heliotrope_dark_skin": {
+  "file": "heliotrope_dark_skin.jpg",
+  "title": "Dermatomyositis11.jpg",
+  "author": "Elizabeth M. Dugan, Adam M. Huber, Frederick W. Miller, Lisa G. Rider",
+  "licence": "CC BY-SA 3.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Dermatomyositis11.jpg"
+ },
+ "ssc_hands_bilateral": {
+  "file": "ssc_hands_bilateral.jpg",
+  "title": "Systemic sclerosis, changes on hands are allways bilateral.jpg",
+  "author": "Maria Sieglinda von Nudeldorf",
+  "licence": "CC BY-SA 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Systemic_sclerosis,_changes_on_hands_are_allways_bilateral.jpg"
+ },
+ "urine_wbc_cast": {
+  "file": "urine_wbc_cast.jpg",
+  "title": "WBC cast in urine.jpg",
+  "author": "Ajay Kumar Chaurasiya",
+  "licence": "CC BY-SA 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:WBC_cast_in_urine.jpg"
+ },
+ "urine_epithelial_cast": {
+  "file": "urine_epithelial_cast.jpg",
+  "title": "Epithelial cell cast.jpg",
+  "author": "Ajay Kumar Chaurasiya",
+  "licence": "CC BY-SA 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Epithelial_cell_cast.jpg"
+ },
+ "power_doppler_synovitis": {
+  "file": "power_doppler_synovitis.jpg",
+  "title": "Wang et al. 2022, Figure 1",
+  "author": "Wang J, Wang M, Qi Q, Wu Z, Wen J",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://doi.org/10.1038/s41598-022-25958-w",
+  "sourceLabel": "Scientific Reports 2022"
+ },
+ "dm_heliotrope_holster_gottron": {
+  "file": "dm_heliotrope_holster_gottron.jpg",
+  "title": "dm_heliotrope_holster_gottron",
+  "author": "Chapagain M, Adhikari P, Pudasaini N, Poudel S, Timilsina B",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://doi.org/10.1002/ccr3.73605",
+  "sourceLabel": "Clin Case Rep 2026"
+ },
+ "dm_tif1g": {
+  "file": "dm_tif1g.jpg",
+  "title": "dm_tif1g",
+  "author": "Demir Y, Ogun H, Sulu B, Oba MC, Seyahi E",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://doi.org/10.1016/j.abd.2026.501443",
+  "sourceLabel": "An Bras Dermatol 2026"
+ },
+ "antisynthetase_heliotrope_mechanics": {
+  "file": "antisynthetase_heliotrope_mechanics.jpg",
+  "title": "antisynthetase_heliotrope_mechanics",
+  "author": "Arrazola-Mendoza KS, González-Chávez HE, De la Peña-Camacho F, Reyes-Ferreira E, Gomez-Alvarez U",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://doi.org/10.7759/cureus.93503",
+  "sourceLabel": "Cureus 2025"
+ },
+ "mechanics_hands_dark_skin": {
+  "file": "mechanics_hands_dark_skin.jpg",
+  "title": "mechanics_hands_dark_skin",
+  "author": "Iba Ba J, Mfoumou A, Nseng-Nseng Ondo I, Kombila UD, Boguikouma JB",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://doi.org/10.48327/mtsi.v5i2.2025.711",
+  "sourceLabel": "Méd Trop Santé Int 2025"
+ },
+ "dle_scalp_dark_skin": {
+  "file": "dle_scalp_dark_skin.jpg",
+  "title": "dle_scalp_dark_skin",
+  "author": "Alchorne MMA, Conceição KDC, Barraza LL, Milanez Morgado de Abreu MA",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://doi.org/10.1016/j.abd.2023.10.001",
+  "sourceLabel": "An Bras Dermatol 2024"
+ },
+ "lupus_oral_palate": {
+  "file": "lupus_oral_palate.jpg",
+  "title": "lupus_oral_palate",
+  "author": "Saeed Z, Khan S, Golani S, Shah N, Hassan M",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://doi.org/10.7759/cureus.106346",
+  "sourceLabel": "Cureus 2026"
+ },
+ "ssc_face_telangiectasia": {
+  "file": "ssc_face_telangiectasia.jpg",
+  "title": "ssc_face_telangiectasia",
+  "author": "Tamura Y, Isobe S, Fujii H, Shirai Y, Kuwana M",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://doi.org/10.3389/fcvm.2026.1956123",
+  "sourceLabel": "Front Cardiovasc Med 2026"
+ },
+ "ssc_face_hands": {
+  "file": "ssc_face_hands.jpg",
+  "title": "ssc_face_hands",
+  "author": "Li J, Zhang J, Li SG, Zhang L, Zou Y, Long T, Yu R, Zhang Y",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://doi.org/10.3389/fmed.2026.1882228",
+  "sourceLabel": "Front Med 2026"
+ },
+ "hep2_ac1_ac2": {
+  "file": "hep2_ac1_ac2.jpg",
+  "title": "hep2_ac1_ac2",
+  "author": "Santos WFS, Cantuária APC, Félix DC, Guimarães NC, de Melo ICS, et al.",
+  "licence": "CC BY",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://doi.org/10.3389/fimmu.2023.1256526",
+  "sourceLabel": "Front Immunol 2023"
+ },
+ "hep2_ac4a_ac4b": {
+  "file": "hep2_ac4a_ac4b.jpg",
+  "title": "hep2_ac4a_ac4b",
+  "author": "Santos WFS, Cantuária APC, Félix DC, Guimarães NC, de Melo ICS, et al.",
+  "licence": "CC BY",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://doi.org/10.3389/fimmu.2023.1256526",
+  "sourceLabel": "Front Immunol 2023"
+ },
+ "hep2_homog_speckled_ac19": {
+  "file": "hep2_homog_speckled_ac19.jpg",
+  "title": "hep2_homog_speckled_ac19",
+  "author": "Tseng YW, Lin CL, Chen SY, Er TK",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://doi.org/10.3389/bjbs.2025.15625",
+  "sourceLabel": "Br J Biomed Sci 2025"
+ },
+ "hep2_pbc_patterns": {
+  "file": "hep2_pbc_patterns.jpg",
+  "title": "hep2_pbc_patterns",
+  "author": "Antal-Szalmás P, Bencze D, Demeter S, Pénzes-Daku K, Szabó L, Tóth B, et al.",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://doi.org/10.1016/j.jtauto.2026.100366",
+  "sourceLabel": "J Transl Autoimmun 2026"
+ },
+ "hep2_rods_rings": {
+  "file": "hep2_rods_rings.jpg",
+  "title": "hep2_rods_rings",
+  "author": "Wang P, Wu S, Liu J, Pei J, Zhang C, Chen X, et al.",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://doi.org/10.3389/fimmu.2026.1831506",
+  "sourceLabel": "Front Immunol 2026"
+ },
+ "hep2_dfs_vs_pseudo": {
+  "file": "hep2_dfs_vs_pseudo.jpg",
+  "title": "hep2_dfs_vs_pseudo",
+  "author": "Sanchez-Hernandez ES, Ortiz-Hernandez GL, Ochoa PT, Reeves M, Bizzaro N, Andrade LEC, Mahler M, Casiano CA",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://doi.org/10.3390/diagnostics13020222",
+  "sourceLabel": "Diagnostics 2023"
+ },
+ "urine_active_sediment": {
+  "file": "urine_active_sediment.jpg",
+  "title": "urine_active_sediment",
+  "author": "Suyambulingam A, K A, Jayakaran V, Venkatesan A, Mathisha EP",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://doi.org/10.7759/cureus.89817",
+  "sourceLabel": "Cureus 2025"
+ },
+ "urine_dysmorphic_rbc": {
+  "file": "urine_dysmorphic_rbc.jpg",
+  "title": "urine_dysmorphic_rbc",
+  "author": "Pons-Belda OD, Ferri MJ, Almería-Lafuente A, Izquierdo-Álvarez C, et al.",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://doi.org/10.1515/almed-2026-0048",
+  "sourceLabel": "Adv Lab Med 2026"
+ },
+ "hep2_ac19_20_anti_oj": {
+  "file": "hep2_ac19_20_anti_oj.jpg",
+  "title": "hep2_ac19_20_anti_oj",
+  "author": "Fritzler MJ, Bentow C, Satoh M, McHugh N, Ghirardello A, Mahler M",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://doi.org/10.3390/diagnostics13010156",
+  "sourceLabel": "Diagnostics 2023"
+ },
+ "lupus_palatal_ulcers": {
+  "file": "lupus_palatal_ulcers.jpg",
+  "title": "lupus_palatal_ulcers",
+  "author": "Uva L, Miguel D, Pinheiro C, Freitas JP, Marques Gomes M, Filipe P, et al.",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://doi.org/10.1155/2012/834291",
+  "sourceLabel": "Autoimmune Dis 2012"
+ },
+ "ssc_puffy_hands": {
+  "file": "ssc_puffy_hands.jpg",
+  "title": "ssc_puffy_hands",
+  "author": "Freixo A, Abreu C",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://doi.org/10.7759/cureus.32291",
+  "sourceLabel": "Cureus 2022"
+ }
+}

@@ -1,0 +1,168 @@
+{
+ "power_doppler_synovitis": {
+  "url": "https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41598-022-25958-w/MediaObjects/41598_2022_25958_Fig1_HTML.png",
+  "title": "Wang et al. 2022, Figure 1",
+  "author": "Wang J, Wang M, Qi Q, Wu Z, Wen J",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://doi.org/10.1038/s41598-022-25958-w",
+  "sourceLabel": "Scientific Reports 2022"
+ },
+ "dm_heliotrope_holster_gottron": {
+  "pmc": "PMC13602977",
+  "stem": "CCR3-14-e73605-g001",
+  "author": "Chapagain M, Adhikari P, Pudasaini N, Poudel S, Timilsina B",
+  "licence": "CC BY 4.0",
+  "doi": "10.1002/ccr3.73605",
+  "sourceLabel": "Clin Case Rep 2026"
+ },
+ "dm_tif1g": {
+  "pmc": "PMC13571497",
+  "stem": "gr1",
+  "author": "Demir Y, Ogun H, Sulu B, Oba MC, Seyahi E",
+  "licence": "CC BY 4.0",
+  "doi": "10.1016/j.abd.2026.501443",
+  "sourceLabel": "An Bras Dermatol 2026"
+ },
+ "antisynthetase_heliotrope_mechanics": {
+  "pmc": "PMC12571203",
+  "stem": "cureus-0017-00000093503-i01",
+  "author": "Arrazola-Mendoza KS, González-Chávez HE, De la Peña-Camacho F, Reyes-Ferreira E, Gomez-Alvarez U",
+  "licence": "CC BY 4.0",
+  "doi": "10.7759/cureus.93503",
+  "sourceLabel": "Cureus 2025"
+ },
+ "mechanics_hands_dark_skin": {
+  "pmc": "PMC12305228",
+  "stem": "mtsi-05-5707-g005",
+  "author": "Iba Ba J, Mfoumou A, Nseng-Nseng Ondo I, Kombila UD, Boguikouma JB",
+  "licence": "CC BY 4.0",
+  "doi": "10.48327/mtsi.v5i2.2025.711",
+  "sourceLabel": "Méd Trop Santé Int 2025"
+ },
+ "dle_scalp_dark_skin": {
+  "pmc": "PMC11074564",
+  "stem": "gr7",
+  "author": "Alchorne MMA, Conceição KDC, Barraza LL, Milanez Morgado de Abreu MA",
+  "licence": "CC BY 4.0",
+  "doi": "10.1016/j.abd.2023.10.001",
+  "sourceLabel": "An Bras Dermatol 2024"
+ },
+ "lupus_oral_palate": {
+  "pmc": "PMC13135664",
+  "stem": "cureus-0018-00000106346-i05",
+  "author": "Saeed Z, Khan S, Golani S, Shah N, Hassan M",
+  "licence": "CC BY 4.0",
+  "doi": "10.7759/cureus.106346",
+  "sourceLabel": "Cureus 2026"
+ },
+ "ssc_face_telangiectasia": {
+  "pmc": "PMC13685168",
+  "stem": "fcvm-13-1956123-g001",
+  "author": "Tamura Y, Isobe S, Fujii H, Shirai Y, Kuwana M",
+  "licence": "CC BY 4.0",
+  "doi": "10.3389/fcvm.2026.1956123",
+  "sourceLabel": "Front Cardiovasc Med 2026"
+ },
+ "ssc_face_hands": {
+  "pmc": "PMC13447209",
+  "stem": "fmed-13-1882228-g001",
+  "author": "Li J, Zhang J, Li SG, Zhang L, Zou Y, Long T, Yu R, Zhang Y",
+  "licence": "CC BY 4.0",
+  "doi": "10.3389/fmed.2026.1882228",
+  "sourceLabel": "Front Med 2026"
+ },
+ "hep2_ac1_ac2": {
+  "pmc": "PMC10811459",
+  "stem": "fimmu-14-1256526-g004",
+  "author": "Santos WFS, Cantuária APC, Félix DC, Guimarães NC, de Melo ICS, et al.",
+  "licence": "CC BY",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "doi": "10.3389/fimmu.2023.1256526",
+  "sourceLabel": "Front Immunol 2023"
+ },
+ "hep2_ac4a_ac4b": {
+  "pmc": "PMC10811459",
+  "stem": "fimmu-14-1256526-g003",
+  "author": "Santos WFS, Cantuária APC, Félix DC, Guimarães NC, de Melo ICS, et al.",
+  "licence": "CC BY",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "doi": "10.3389/fimmu.2023.1256526",
+  "sourceLabel": "Front Immunol 2023"
+ },
+ "hep2_homog_speckled_ac19": {
+  "pmc": "PMC12745285",
+  "stem": "bjbs-82-15625-g003",
+  "author": "Tseng YW, Lin CL, Chen SY, Er TK",
+  "licence": "CC BY 4.0",
+  "doi": "10.3389/bjbs.2025.15625",
+  "sourceLabel": "Br J Biomed Sci 2025"
+ },
+ "hep2_pbc_patterns": {
+  "pmc": "PMC13068664",
+  "stem": "gr3",
+  "author": "Antal-Szalmás P, Bencze D, Demeter S, Pénzes-Daku K, Szabó L, Tóth B, et al.",
+  "licence": "CC BY 4.0",
+  "doi": "10.1016/j.jtauto.2026.100366",
+  "sourceLabel": "J Transl Autoimmun 2026"
+ },
+ "hep2_rods_rings": {
+  "pmc": "PMC13272418",
+  "stem": "fimmu-17-1831506-g001",
+  "author": "Wang P, Wu S, Liu J, Pei J, Zhang C, Chen X, et al.",
+  "licence": "CC BY 4.0",
+  "doi": "10.3389/fimmu.2026.1831506",
+  "sourceLabel": "Front Immunol 2026"
+ },
+ "hep2_dfs_vs_pseudo": {
+  "pmc": "PMC9858485",
+  "stem": "diagnostics-13-00222-g001",
+  "author": "Sanchez-Hernandez ES, Ortiz-Hernandez GL, Ochoa PT, Reeves M, Bizzaro N, Andrade LEC, Mahler M, Casiano CA",
+  "licence": "CC BY 4.0",
+  "doi": "10.3390/diagnostics13020222",
+  "sourceLabel": "Diagnostics 2023"
+ },
+ "urine_active_sediment": {
+  "pmc": "PMC12422400",
+  "stem": "cureus-0017-00000089817-i03",
+  "author": "Suyambulingam A, K A, Jayakaran V, Venkatesan A, Mathisha EP",
+  "licence": "CC BY 4.0",
+  "doi": "10.7759/cureus.89817",
+  "sourceLabel": "Cureus 2025"
+ },
+ "urine_dysmorphic_rbc": {
+  "pmc": "PMC13552805",
+  "stem": "j_almed-2026-0048_fig_001",
+  "author": "Pons-Belda OD, Ferri MJ, Almería-Lafuente A, Izquierdo-Álvarez C, et al.",
+  "licence": "CC BY 4.0",
+  "doi": "10.1515/almed-2026-0048",
+  "sourceLabel": "Adv Lab Med 2026"
+ },
+ "hep2_ac19_20_anti_oj": {
+  "pmc": "PMC9818932",
+  "stem": "diagnostics-13-00156-g004",
+  "author": "Fritzler MJ, Bentow C, Satoh M, McHugh N, Ghirardello A, Mahler M",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "doi": "10.3390/diagnostics13010156",
+  "sourceLabel": "Diagnostics 2023"
+ },
+ "lupus_palatal_ulcers": {
+  "pmc": "PMC3410306",
+  "stem": "AD2012-834291.004",
+  "author": "Uva L, Miguel D, Pinheiro C, Freitas JP, Marques Gomes M, Filipe P, et al.",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "doi": "10.1155/2012/834291",
+  "sourceLabel": "Autoimmune Dis 2012"
+ },
+ "ssc_puffy_hands": {
+  "pmc": "PMC9820582",
+  "stem": "cureus-0014-00000032291-i02",
+  "author": "Freixo A, Abreu C",
+  "licence": "CC BY 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "doi": "10.7759/cureus.32291",
+  "sourceLabel": "Cureus 2022"
+ }
+}

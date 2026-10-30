@@ -1,0 +1,721 @@
+{
+  "version": "2.0.0-draft",
+  "status": "Design-assumption values are marked grade D. Do not deploy clinically before local calibration.",
+  "engineParameters": {
+    "beta0LogOdds": -4.1846,
+    "beta1SlopePerPoint": 0.48,
+    "patternShrinkageAlpha": 0.65,
+    "combinedLrCap": 26,
+    "confounderFloor": 0.3,
+    "confounderAppliesBelowScore": 8,
+    "familyHistoryPretestOddsMultiplier": 1.5,
+    "thresholds": {
+      "greenMaxPost": 0.05,
+      "yellowMaxPost": 0.35,
+      "expeditedMinPost": 0.75,
+      "redScore": 8
+    },
+    "lowPretestMaxScore": 3,
+    "titerSoftReflexFrom": "titer_1_320"
+  },
+  "assayMethods": [
+    {
+      "id": "hep2_iif",
+      "label": "HEp-2 IIF (reference method)",
+      "useTiterBands": true
+    },
+    {
+      "id": "solid_phase",
+      "label": "ELISA / multiplex / CBA",
+      "useTiterBands": false,
+      "note": "No titer. Use assayCombos. Replace with manufacturer cutoff."
+    }
+  ],
+  "assayCombos": [
+    {
+      "id": "iif_pos_only",
+      "lr": 5.1,
+      "source": "Bossuyt 2020",
+      "grade": "B"
+    },
+    {
+      "id": "sp_pos_only",
+      "lr": 14.4,
+      "source": "Bossuyt 2020",
+      "grade": "B"
+    },
+    {
+      "id": "both_pos",
+      "lr": 26.2,
+      "source": "Bossuyt 2020",
+      "grade": "B"
+    },
+    {
+      "id": "both_neg",
+      "lr": 0.15,
+      "source": "Bossuyt 2020",
+      "grade": "B"
+    }
+  ],
+  "clinicalDomains": [
+    {
+      "id": "constitutional",
+      "rule": "MAX",
+      "items": [
+        {
+          "id": "fever",
+          "label": "Unexplained fever >38.3C (after infection work-up)",
+          "weight": 2,
+          "src": "SLE 2019",
+          "grade": "A"
+        }
+      ]
+    },
+    {
+      "id": "msk",
+      "rule": "MAX",
+      "items": [
+        {
+          "id": "synovitis",
+          "label": "Synovitis >=2 joints, or tenderness >=2 joints + >=30 min stiffness",
+          "weight": 6,
+          "src": "SLE 2019",
+          "grade": "A"
+        },
+        {
+          "id": "proximal_weakness",
+          "label": "Objective proximal weakness with raised CK",
+          "weight": 6,
+          "src": "IIM 2017 (rescaled)",
+          "grade": "D"
+        }
+      ]
+    },
+    {
+      "id": "lupus_skin",
+      "rule": "MAX",
+      "items": [
+        {
+          "id": "acute_cutaneous_lupus",
+          "label": "Malar (spares nasolabial folds) or generalised photosensitive rash",
+          "weight": 6,
+          "src": "SLE 2019",
+          "grade": "A"
+        },
+        {
+          "id": "scle_discoid",
+          "label": "Subacute cutaneous or discoid lupus",
+          "weight": 4,
+          "src": "SLE 2019",
+          "grade": "A"
+        },
+        {
+          "id": "oral_ulcer_alopecia",
+          "label": "Painless oral ulcers or non-scarring alopecia",
+          "weight": 2,
+          "src": "SLE 2019",
+          "grade": "A"
+        }
+      ]
+    },
+    {
+      "id": "myositis_skin",
+      "rule": "MAX",
+      "items": [
+        {
+          "id": "gottron_heliotrope",
+          "label": "Gottron papules/sign or heliotrope rash",
+          "weight": 6,
+          "src": "IIM 2017 (rescaled)",
+          "grade": "D"
+        },
+        {
+          "id": "mechanics_hands",
+          "label": "Mechanic's hands (cracked, scaly skin along the fingers)",
+          "weight": 4,
+          "src": "Antisynthetase syndrome (design: not scored in 2017 IIM criteria)",
+          "grade": "D"
+        }
+      ]
+    },
+    {
+      "id": "sclerosis_skin",
+      "rule": "MAX",
+      "items": [
+        {
+          "id": "skin_thickening_proximal_mcp",
+          "label": "Skin thickening proximal to MCPs",
+          "weight": 9,
+          "src": "SSc 2013 (sufficient alone)",
+          "grade": "A"
+        },
+        {
+          "id": "sclerodactyly",
+          "label": "Sclerodactyly (fingers distal to MCPs)",
+          "weight": 4,
+          "src": "SSc 2013",
+          "grade": "A"
+        },
+        {
+          "id": "puffy_fingers",
+          "label": "Puffy fingers (diffuse swelling of the fingers)",
+          "weight": 2,
+          "src": "SSc 2013",
+          "grade": "A"
+        }
+      ]
+    },
+    {
+      "id": "vascular",
+      "rule": "MAX",
+      "items": [
+        {
+          "id": "digital_ulcer",
+          "label": "Digital ulcer / pitting scars / gangrene",
+          "weight": 5,
+          "src": "SSc 2013 (rescaled)",
+          "grade": "D"
+        },
+        {
+          "id": "raynaud",
+          "label": "Biphasic/triphasic Raynaud",
+          "weight": 4,
+          "src": "SSc 2013 =3; set 4 to hit 10% anchor",
+          "grade": "D"
+        },
+        {
+          "id": "telangiectasia",
+          "label": "Telangiectasia (face, hands, lips)",
+          "weight": 2,
+          "src": "SSc 2013",
+          "grade": "A"
+        }
+      ]
+    },
+    {
+      "id": "sicca",
+      "rule": "MAX",
+      "items": [
+        {
+          "id": "objective_sicca",
+          "label": "Objective sicca (Schirmer<=5, OSS>=5, UWS<=0.1) or parotid swelling",
+          "weight": 4,
+          "src": "Sjogren 2016 (rescaled)",
+          "grade": "D"
+        }
+      ]
+    },
+    {
+      "id": "renal",
+      "rule": "MAX",
+      "items": [
+        {
+          "id": "nephritis_class_3_4",
+          "label": "Biopsy class III/IV lupus nephritis",
+          "weight": 10,
+          "src": "SLE 2019",
+          "grade": "A"
+        },
+        {
+          "id": "nephritis_class_2_5",
+          "label": "Biopsy class II/V lupus nephritis",
+          "weight": 8,
+          "src": "SLE 2019",
+          "grade": "A"
+        },
+        {
+          "id": "proteinuria",
+          "label": "Proteinuria >0.5 g/24h (UPCR >0.5) or active sediment",
+          "weight": 4,
+          "src": "SLE 2019 (sediment: design)",
+          "grade": "A/D"
+        }
+      ]
+    },
+    {
+      "id": "serosal",
+      "rule": "MAX",
+      "items": [
+        {
+          "id": "pericarditis",
+          "label": "Acute pericarditis",
+          "weight": 6,
+          "src": "SLE 2019",
+          "grade": "A"
+        },
+        {
+          "id": "effusion",
+          "label": "Pleural or pericardial effusion",
+          "weight": 5,
+          "src": "SLE 2019",
+          "grade": "A"
+        }
+      ]
+    },
+    {
+      "id": "pulmonary",
+      "rule": "MAX",
+      "items": [
+        {
+          "id": "ild_pah",
+          "label": "Unexplained ILD (NSIP/UIP) or PAH",
+          "weight": 4,
+          "src": "SSc 2013 =2; moderate tier",
+          "grade": "D"
+        }
+      ]
+    },
+    {
+      "id": "neuropsych",
+      "rule": "MAX",
+      "items": [
+        {
+          "id": "seizure",
+          "label": "Seizure",
+          "weight": 5,
+          "src": "SLE 2019",
+          "grade": "A"
+        },
+        {
+          "id": "psychosis",
+          "label": "Psychosis",
+          "weight": 3,
+          "src": "SLE 2019",
+          "grade": "A"
+        },
+        {
+          "id": "delirium",
+          "label": "Delirium",
+          "weight": 2,
+          "src": "SLE 2019",
+          "grade": "A"
+        }
+      ]
+    },
+    {
+      "id": "hematologic",
+      "rule": "MAX",
+      "items": [
+        {
+          "id": "hemolysis",
+          "label": "Autoimmune hemolysis",
+          "weight": 4,
+          "src": "SLE 2019",
+          "grade": "A"
+        },
+        {
+          "id": "thrombocytopenia",
+          "label": "Platelets <100,000 (no other cause)",
+          "weight": 4,
+          "src": "SLE 2019",
+          "grade": "A"
+        },
+        {
+          "id": "leukopenia",
+          "label": "WBC <4,000 (no other cause)",
+          "weight": 3,
+          "src": "SLE 2019",
+          "grade": "A"
+        }
+      ]
+    },
+    {
+      "id": "aps_clinical",
+      "rule": "MAX",
+      "items": [
+        {
+          "id": "thrombosis_pregnancy_loss",
+          "label": "Unprovoked thrombosis or recurrent pregnancy loss",
+          "weight": 3,
+          "src": "Repo moderate tier",
+          "grade": "D"
+        }
+      ]
+    },
+    {
+      "id": "penalty",
+      "rule": "PENALTY_IF_NO_OBJECTIVE",
+      "items": [
+        {
+          "id": "nonspecific_only",
+          "label": "Fatigue / diffuse pain / fibromyalgia / brain fog ONLY",
+          "weight": -2,
+          "src": "Arora 2017; Kotter 2007",
+          "grade": "C"
+        }
+      ]
+    }
+  ],
+  "redFlags": [
+    "new_proteinuria_or_active_sediment_or_rising_creatinine",
+    "significant_cytopenia_esp_with_fever",
+    "pleuritic_pericardial_pain_or_effusion",
+    "seizure_psychosis_delirium_focal_deficit",
+    "digital_ischemia_ulcer_gangrene",
+    "rapid_proximal_weakness_dysphagia_dyspnea",
+    "new_dyspnea_or_crackles_with_raynaud_or_rash",
+    "fever_or_weight_loss_with_strong_ctd_suspicion",
+    "thrombosis_or_pregnancy_morbidity"
+  ],
+  "titerSpectrum": [
+    {
+      "id": "titer_neg",
+      "std": "<1:40",
+      "legacy32": "<1:32",
+      "healthyBand": 0.683,
+      "healthyCumulative": 0.0,
+      "lr": 0.05,
+      "lrRange": [
+        0.03,
+        0.08
+      ],
+      "grade": "B"
+    },
+    {
+      "id": "titer_1_40",
+      "std": "1:40",
+      "legacy32": "1:32",
+      "healthyBand": 0.184,
+      "healthyCumulative": 0.317,
+      "lr": 0.7,
+      "lrRange": [
+        0.3,
+        1.0
+      ],
+      "grade": "D"
+    },
+    {
+      "id": "titer_1_80",
+      "std": "1:80",
+      "legacy32": "1:64",
+      "healthyBand": 0.083,
+      "healthyCumulative": 0.133,
+      "lr": 0.5,
+      "lrRange": [
+        0.25,
+        0.8
+      ],
+      "grade": "C"
+    },
+    {
+      "id": "titer_1_160",
+      "std": "1:160",
+      "legacy32": "1:128",
+      "healthyBand": 0.017,
+      "healthyCumulative": 0.05,
+      "lr": 2.0,
+      "lrRange": [
+        1.0,
+        6.0
+      ],
+      "grade": "D"
+    },
+    {
+      "id": "titer_1_320",
+      "std": "1:320",
+      "legacy32": "1:256",
+      "healthyBand": 0.013,
+      "healthyCumulative": 0.033,
+      "lr": 10,
+      "lrRange": [
+        6,
+        26
+      ],
+      "grade": "C"
+    },
+    {
+      "id": "titer_1_640",
+      "std": "1:640",
+      "legacy32": "1:512",
+      "healthyBand": 0.01,
+      "healthyCumulative": 0.02,
+      "lr": 19,
+      "lrRange": [
+        10,
+        26
+      ],
+      "grade": "C"
+    },
+    {
+      "id": "titer_1_1280",
+      "std": ">=1:1280",
+      "legacy32": ">=1:1024",
+      "healthyBand": 0.01,
+      "healthyCumulative": 0.01,
+      "lr": 20,
+      "lrRange": [
+        12,
+        26
+      ],
+      "grade": "C"
+    }
+  ],
+  "icapPatterns": [
+    {
+      "id": "AC-1",
+      "name": "Homogeneous",
+      "lr": 1.5,
+      "grade": "D",
+      "order": [
+        "anti-dsDNA",
+        "C3/C4",
+        "UA+UPCR",
+        "anti-histone if culprit drug"
+      ],
+      "avoid": [
+        "anti-centromere"
+      ]
+    },
+    {
+      "id": "AC-2",
+      "name": "Dense fine speckled (DFS70)",
+      "lr": 0.18,
+      "lrRange": [
+        0.05,
+        0.5
+      ],
+      "grade": "C",
+      "conditional": "adult AND anti-DFS70 monospecific confirmed AND no specific Ab AND no objective feature; else use lrUnconfirmed",
+      "lrUnconfirmed": 0.5,
+      "bypassShrinkage": true,
+      "order": [
+        "anti-DFS70 (if not done)",
+        "limited ENA to exclude co-antibodies"
+      ],
+      "avoid": [
+        "broad ENA panel"
+      ]
+    },
+    {
+      "id": "AC-3",
+      "name": "Centromere",
+      "lr": 22,
+      "grade": "C",
+      "softReflex": true,
+      "order": [
+        "Raynaud/puffy-finger/capillaroscopy screen",
+        "ALP + AMA",
+        "echo/PFT with DLCO if SSc features"
+      ],
+      "avoid": [
+        "broad ENA panel"
+      ],
+      "caveat": "In anti-CENP+ cohort PBC 23.8% and Sjogren 22.5% outnumbered SSc 6.2% (Li 2026)."
+    },
+    {
+      "id": "AC-4",
+      "name": "Fine speckled",
+      "lr": 1.5,
+      "grade": "D",
+      "order": [
+        "anti-SSA/Ro60/52",
+        "anti-SSB/La"
+      ],
+      "addIf": {
+        "weakness_or_rash": [
+          "myositis panel",
+          "CK"
+        ]
+      }
+    },
+    {
+      "id": "AC-4a",
+      "name": "Myriad discrete fine speckled (Ro60)",
+      "lr": null,
+      "grade": "D",
+      "order": [
+        "anti-SSA/Ro60"
+      ],
+      "note": "Reflex only; no probability change."
+    },
+    {
+      "id": "AC-5",
+      "name": "Large/coarse speckled",
+      "lr": 4.2,
+      "grade": "D",
+      "softReflex": true,
+      "order": [
+        "anti-Sm",
+        "anti-U1-RNP",
+        "anti-RNA Pol III if skin/Raynaud",
+        "C3/C4"
+      ]
+    },
+    {
+      "id": "AC-6_7",
+      "name": "Nuclear dots (multiple/few)",
+      "lr": null,
+      "grade": "D",
+      "order": [
+        "AMA",
+        "ALP",
+        "anti-Sp100"
+      ],
+      "note": "Organ-specific (PBC), reflex only."
+    },
+    {
+      "id": "AC-8_9_10",
+      "name": "Nucleolar (homogeneous/clumpy/punctate)",
+      "lr": 4.2,
+      "grade": "D",
+      "softReflex": true,
+      "order": [
+        "SSc panel (Scl-70, RNA Pol III, PM/Scl, Th/To, fibrillarin)",
+        "HRCT + PFT if Raynaud/dyspnea"
+      ],
+      "avoid": [
+        "anti-histone"
+      ],
+      "caveat": "Often high titer without disease; specific antibody carries the association."
+    },
+    {
+      "id": "AC-12",
+      "name": "Punctate nuclear envelope",
+      "lr": null,
+      "grade": "D",
+      "order": [
+        "AMA",
+        "anti-gp210"
+      ]
+    },
+    {
+      "id": "AC-13",
+      "name": "PCNA-like",
+      "lr": null,
+      "grade": "D",
+      "order": [
+        "anti-PCNA if available",
+        "anti-dsDNA"
+      ]
+    },
+    {
+      "id": "AC-14",
+      "name": "CENP-F-like",
+      "lr": null,
+      "grade": "D",
+      "order": [
+        "age-appropriate cancer evaluation"
+      ],
+      "note": "Low SARD yield."
+    },
+    {
+      "id": "AC-15",
+      "name": "Cytoplasmic fibrillar linear (actin)",
+      "lr": null,
+      "grade": "D",
+      "order": [
+        "anti-smooth muscle Ab",
+        "LFTs"
+      ]
+    },
+    {
+      "id": "AC-19_20",
+      "name": "Cytoplasmic speckled (AC-19 dense fine, AC-20 fine)",
+      "lr": 4.5,
+      "grade": "D",
+      "softReflex": true,
+      "order": [
+        "Jo-1 + antisynthetase panel (PL-7, PL-12)",
+        "ribosomal P",
+        "CK",
+        "chest imaging/PFT"
+      ],
+      "avoid": [
+        "nuclear-only ENA"
+      ],
+      "caveat": "Can be reported with a nuclear-negative screen."
+    },
+    {
+      "id": "AC-21",
+      "name": "Reticular / AMA",
+      "lr": null,
+      "grade": "B",
+      "softReflex": true,
+      "order": [
+        "AMA-M2",
+        "ALP"
+      ]
+    },
+    {
+      "id": "AC-22_23",
+      "name": "Golgi / rods and rings",
+      "lr": null,
+      "grade": "D",
+      "order": [],
+      "note": "Low yield; ask about HCV therapy (rods/rings)."
+    },
+    {
+      "id": "AC-24_28",
+      "name": "Mitotic (centrosome, spindle, NuMA, bridge, chromosomal)",
+      "lr": null,
+      "grade": "D",
+      "order": [],
+      "note": "Mostly non-specific."
+    },
+    {
+      "id": "AC-29",
+      "name": "Topoisomerase I-like",
+      "lr": 10,
+      "grade": "D",
+      "softReflex": true,
+      "order": [
+        "anti-Scl-70",
+        "HRCT + PFT"
+      ],
+      "note": "96.2% of SSc with AC-29 are anti-Scl-70+ (Ouyang 2026)."
+    },
+    {
+      "id": "UNSPEC",
+      "name": "Pattern not reported / 'speckled' only",
+      "lr": 1.0,
+      "grade": "-",
+      "order": [
+        "ask lab for ICAP code"
+      ],
+      "note": "Do not guess AC-2 vs AC-4 vs AC-5."
+    }
+  ],
+  "confounders": [
+    {
+      "id": "chronic_infection",
+      "label": "Active/chronic infection (HCV, EBV, SBE)",
+      "cf": 0.45,
+      "grade": "D"
+    },
+    {
+      "id": "culprit_drug",
+      "label": "Culprit drug (hydralazine, procainamide, minocycline, anti-TNF, ICI)",
+      "cf": 0.5,
+      "grade": "D",
+      "route": "drug-induced lupus branch"
+    },
+    {
+      "id": "autoimmune_thyroid",
+      "label": "Hashimoto / Graves",
+      "cf": 0.55,
+      "grade": "D"
+    },
+    {
+      "id": "age_over_65",
+      "label": "Age >65",
+      "cf": 0.7,
+      "grade": "C"
+    },
+    {
+      "id": "first_degree_relative",
+      "label": "First-degree relative with AARD",
+      "cf": 0.75,
+      "grade": "D",
+      "also": "raises pretest odds (familyHistoryPretestOddsMultiplier)"
+    }
+  ],
+  "specificAntibodiesForcingReferral": [
+    "anti-dsDNA",
+    "anti-Sm",
+    "anti-Scl-70",
+    "anti-RNA-PolIII",
+    "anti-Jo-1",
+    "anti-U1-RNP",
+    "anti-centromere+Raynaud"
+  ]
+}

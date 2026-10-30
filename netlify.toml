@@ -1,0 +1,8 @@
+# index.html is committed (built with `node build.mjs`), so Netlify only needs to publish the folder.
+[build]
+  publish = "."
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
